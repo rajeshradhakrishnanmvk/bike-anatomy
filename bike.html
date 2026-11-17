@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0a08">
+  <meta name="description" content="Harley-Davidson Bike Anatomy study: silent tour, NotebookLM studio plates, and a raw WebGL viewer.">
+  <title>Motorcycle — Bike Anatomy</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="skip" href="#study">Skip to this motorcycle</a>
+  <header class="site-header compact">
+    <div class="wrap header-row">
+      <p class="brand"><a href="index.html">Bike Anatomy</a></p>
+      <p class="byline">A series by Rajesh Radhakrishnan</p>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      <p class="back"><a href="index.html">Back to the shop</a></p>
+      <div id="study">
+        <h1>Opening this motorcycle…</h1>
+      </div>
+      <noscript>
+        <p>Enable JavaScript to read this motorcycle from <code>bikes.js</code>. Viewers live in <code>bikes/&lt;slug&gt;/</code>.</p>
+      </noscript>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <p>Research with NotebookLM. Built with HTML5, vanilla JS, CSS and raw WebGL, zero dependencies.</p>
+      <p><a href="https://github.com/rajeshradhakrishnanmvk/bike-anatomy">github.com/rajeshradhakrishnanmvk/bike-anatomy</a></p>
+    </div>
+  </footer>
+  <dialog id="lightbox" class="lightbox" aria-labelledby="lightbox-title" tabindex="-1">
+    <div class="lightbox-bar">
+      <h2 id="lightbox-title">Plate</h2>
+      <div class="lightbox-actions">
+        <a id="lightbox-original" href="">Original PNG</a>
+        <button type="button" id="lightbox-close" class="btn">Close</button>
+      </div>
+    </div>
+    <img id="lightbox-img" alt="">
+  </dialog>
+  <script src="bikes.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
