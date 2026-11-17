@@ -174,7 +174,8 @@ const DATA = {
   'Bore × stroke: 74 ci 3.00″ × 5.25″ (marked “approx 74ci geometry”); 80 ci 3.42″ × 4.25″',
   'Compression: V medium 4.5:1 · VL high 5.0:1 · VLH high 5.5:1',
   'Output: ~28 hp (V) · ~30 hp (VL) · ~34 hp (VLH)',
-  'Completely detachable heads with newly developed gasket technology, which made carbon scraping and valve grinding much simpler'],
+  'Completely detachable heads with newly developed gasket technology, which made carbon scraping and valve grinding much simpler',
+  'Barrels and heads are black. 1936 barrels and heads carry a denser set of cooling fins'],
   conf:['bore','vld']},
  valves:{sys:'engine',name:'Side valves & cam gear case',sec:'§3',specs:[
   'Flathead valves are mounted parallel to the cylinder bore inside the engine block itself',
@@ -269,18 +270,22 @@ const DATA = {
  tank:{sys:'body',name:'Fuel tank & paint',sec:'§2, §6',specs:[
   'With funds tight in the Depression, Harley-Davidson leaned on bold two-tone paint, distinctive tank motifs and badge revisions',
   '1933: Olive Green discontinued as standard paint',
+  '1933–1935: Mandarin Red & Black, as on the museum VLD bikes',
   '1936 two-tone schemes: Maroon & Nile Green, Sherwood Green & Silver, Teak Red & Black, Dusk Gray & Buff, Venetian Blue & Cream'],
-  note:'The report gives no tank capacity. Paint colours on the model are approximations of the named schemes.'},
+  note:'The report gives no tank capacity. Paint colours on the model are approximations of the named schemes. Two-tone second colours also cover the fender side valances.'},
  oiltank:{sys:'body',name:'Oil tank & hand pump',sec:'§3',specs:[
   'Holds the fresh oil that the mechanical pump feeds to the crankcase (total-loss)',
   'Riders used a manual hand pump to add extra oil during high-speed running or heavy climbing'],
   note:'The report does not say where the oil tank sits; the model places it in the left tank half.'},
  graphics:{sys:'body',name:'Tank graphics',sec:'§6',specs:[
-  '1933: a one-year-only Art Deco bird motif painted on the fuel tank',
-  '1934: the diamond-shaped tank logo is introduced'],
-  note:'Use the Year button. The report describes no tank graphic for 1930–1932 and lists introductions only, so carrying the diamond past 1934 is the viewer’s assumption.'},
- ffender:{sys:'body',name:'Front fender',nodata:true},
- rfender:{sys:'body',name:'Rear fender',nodata:true},
+  '1930–1932: red Harley-Davidson script wordmark',
+  '1933: red teardrop panel, gold Art Deco bird and script lettering (the report’s one-year bird)',
+  '1934–1936: winged Art Deco badge with Harley-Davidson lettering (the report’s 1934 diamond, drawn as the museum winged badge)'],
+  note:'The report names the 1933 bird and the 1934 diamond only. Early script, and a winged badge through 1936, follow museum bikes (1932 VL, 1933 VLD, 1934 VLD, 1936 VLH). Use the Year button.'},
+ ffender:{sys:'body',name:'Front fender',nodata:true,
+  note:'When a paint has a second colour, that colour is the fender side valance: cream on Venetian, silver on Sherwood, black on Mandarin Red & Black.'},
+ rfender:{sys:'body',name:'Rear fender',nodata:true,
+  note:'Same two-tone valance treatment as the front fender.'},
  horn:{sys:'body',name:'Horn & Sunburst faceplate',sec:'§6',specs:[
   '1931: the famous “Sunburst” horn faceplate is introduced on all twin models']},
  tail:{sys:'body',name:'Tail light',sec:'§6',specs:[
@@ -300,8 +305,10 @@ const DATA = {
   note:'The report gives no battery specs.'},
  bars:{sys:'elec',name:'Handlebars & internal control coils',sec:'§6',specs:[
   'Clean, uncluttered internal control linkages',
-  'Throttle and spark advance run on internal steel control coils routed entirely inside the hollow handlebars, with no external cables']},
- headlamp:{sys:'elec',name:'Headlamp',nodata:true}
+  'Throttle and spark advance run on internal steel control coils routed entirely inside the hollow handlebars, with no external cables'],
+  note:'Grips are cream on 1936 and on two-tone schemes, black rubber otherwise. The report does not specify grip colour.'},
+ headlamp:{sys:'elec',name:'Headlamp',nodata:true,
+  note:'The report does not describe the lamp. 1930, the first year of the 74: twin bullet lamps and a round fork toolbox (Bonhams 30VL10916 and period notes). 1931–1936: one central lamp, as on the museum bikes.'}
 };
 const SUFFIXES='Equipment suffixes: S sidecar gearing · M commercial trim · G gear/commercial variant · E magneto ignition trim · J performance trim.';
 const VARIANTS = [
@@ -320,17 +327,18 @@ const VARIANTS = [
 ];
 const YEARS=[1930,1931,1932,1933,1934,1935,1936];
 const YEAR_NOTES={
- 1930:'The initial 1930 V-Series flathead twin, on a new frame design',
- 1931:'“Sunburst” horn faceplate on all twins · Schebler Deluxe carburetor · reverse gearbox option',
- 1932:'Three-wheeled G-Series Servi-Car introduced; R-series 45 twins begin',
- 1933:'One-year Art Deco bird tank motif · Olive Green dropped as standard · Buddy Seat option · Linkert Model M',
- 1934:'Diamond-shaped tank logo · streamlined Airflow tail light',
- 1935:'Cast-metal Beehive tail light · first 80 ci flatheads (VLDD / VDDS)',
- 1936:'Two-tone paint · first constant-mesh 4-speed · 80 ci VLH · sold alongside the 61 ci OHV Knucklehead'
+ 1930:'Twin bullet lamps and a cylindrical fork toolbox on the first-year 74 · new frame · script tank wordmark',
+ 1931:'Single headlamp · “Sunburst” horn · Schebler Deluxe · reverse gearbox option · script wordmark',
+ 1932:'Script tank wordmark continues · Servi-Car introduced · R-series 45 twins begin',
+ 1933:'Red teardrop, gold bird and script · Olive dropped · Mandarin Red & Black · Buddy Seat · Linkert',
+ 1934:'Winged tank badge · streamlined Airflow tail light · Mandarin Red & Black',
+ 1935:'Cast-metal Beehive tail light · first 80 ci flatheads (VLDD / VDDS) · Mandarin Red & Black',
+ 1936:'Two-tone paint, including fender valances · denser cylinder fins · 4-speed · 80 ci VLH'
 };
 /* paint: names from the report (§6); RGB values are the viewer's approximations */
 const PAINTS=[
  {id:'olive',name:'Olive Green',years:'standard until 1933',body:[0.25,0.31,0.16],frame:[0.21,0.26,0.14],tone:[0.25,0.31,0.16]},
+ {id:'mandarin',name:'Mandarin Red & Black',years:'1933–1935',body:[0.58,0.08,0.05],frame:[0.035,0.034,0.032],tone:[0.055,0.05,0.048]},
  {id:'maroon',name:'Maroon & Nile Green',years:'1936',body:[0.34,0.05,0.07],frame:[0.035,0.034,0.032],tone:[0.50,0.68,0.52]},
  {id:'sherwood',name:'Sherwood Green & Silver',years:'1936',body:[0.08,0.22,0.13],frame:[0.035,0.034,0.032],tone:[0.70,0.71,0.72]},
  {id:'teak',name:'Teak Red & Black',years:'1936',body:[0.52,0.12,0.07],frame:[0.035,0.034,0.032],tone:[0.04,0.04,0.04]},
@@ -450,7 +458,7 @@ const C={black:[0.045,0.043,0.04],nickel:[0.80,0.79,0.76],alu:[0.56,0.555,0.53],
 /* ----------------------------- geometry ------------------------------
    Units: metres. +X forward, +Y up, +Z = right side of the bike. Proportions are
    illustrative; the report gives no frame or wheelbase dimensions. */
-const F=[0.78,0.322,0], R=[-0.72,0.322,0];
+const F=[0.802,0.322,0], R=[-0.742,0.322,0]; // 1.544 m, longer and heavier than the 45's 1.435 m
 const CR=[0.04,0.31,0];
 const B1=[0.09,0.44,0], A1=norm([Math.sin(Math.PI/8),Math.cos(Math.PI/8),0]);   // front cylinder (22.5° fwd)
 const B2=[-0.01,0.44,0], A2=norm([-Math.sin(Math.PI/8),Math.cos(Math.PI/8),0]); // rear cylinder (22.5° back) = 45° V
@@ -467,15 +475,21 @@ function wheel(c){
  col(C.nickel,MAT.CHROME);latheAt(c,Z,[[0,-0.08],[0.012,-0.08],[0.012,0.08],[0,0.08]],10,XH);
  for(let k=0;k<40;k++){const s=k%2?1:-1,a=k/40*TAU,b=a+0.4*((k>>1)%2?1:-1);
   cylAB([c[0]+0.045*Math.cos(a),c[1]+0.045*Math.sin(a),s*0.042],[c[0]+0.21*Math.cos(b),c[1]+0.21*Math.sin(b),s*0.007],0.0025,5);}}
-function fender(c,a0,a1,Rf,W){const nt=48,nw=14;const P=[];
+function fender(c,a0,a1,Rf,W){const nt=48,nw=16;const P=[];
+ const skirtOf=s=>{const side=Math.abs(s);return side>0.56?(side-0.56)*0.44:0;};
  for(let i=0;i<=nt;i++){const a=a0+(a1-a0)*i/nt,ca=Math.cos(a),sa=Math.sin(a);const r=[];
-  for(let j=0;j<=nw;j++){const s=-1+2*j/nw;const rad=Rf+0.024*(1-s*s)-(Math.abs(s)>0.8?(Math.abs(s)-0.8)*0.32:0);r.push([c[0]+rad*ca,c[1]+rad*sa,s*W]);}P.push(r);}
- col(C.body,MAT.BODY);grid(P,false,false);
- col(C.cream,MAT.PAINT);for(const s of [-0.55,0.55]){const pts=[];for(let i=2;i<=nt-2;i++){const a=a0+(a1-a0)*i/nt;const rad=Rf+0.024*(1-s*s)+0.0022;pts.push([c[0]+rad*Math.cos(a),c[1]+rad*Math.sin(a),s*W]);}tube(pts,0.0018,5,false,true);}}
+  for(let j=0;j<=nw;j++){const s=-1+2*j/nw;const rad=Rf+0.030*(1-s*s)-skirtOf(s);r.push([c[0]+rad*ca,c[1]+rad*sa,s*W]);}P.push(r);}
+ const jAt=s0=>Math.round((s0+1)/2*nw), jL=jAt(-0.58), jR=jAt(0.58);
+ const slice=(a,b)=>P.map(row=>row.slice(a,b+1));
+ col(C.cream,MAT.STRIPE);grid(slice(0,jL),false,false);
+ col(C.body,MAT.BODY);grid(slice(jL,jR),false,false);
+ col(C.cream,MAT.STRIPE);grid(slice(jR,nw),false,false);
+ col(C.gold,MAT.PAINT);
+ for(const j of [jL,jR]){const s=-1+2*j/nw;const pts=[];for(let i=2;i<=nt-2;i++){const a=a0+(a1-a0)*i/nt;const rad=Rf+0.030*(1-s*s)-skirtOf(s)+0.0022;pts.push([c[0]+rad*Math.cos(a),c[1]+rad*Math.sin(a),s*W]);}tube(pts,0.0018,5,false,true);}}
 /* teardrop saddle tank halves; returns the section function */
-function tankSec(zc){const x0=0.48,x1=-0.10;
- return t=>{const x=lerp(x0,x1,t),e=Math.max(Math.pow(Math.max(Math.sin(Math.PI*clamp(t,0,1)),0),0.24),0.02);
-  return {x,y:topTubeY(x)-0.004+0.006*(1-t),z:zc,w:0.074*e+0.0005,h:(0.088+0.016*(1-t))*e,e:2.6};};}
+function tankSec(zc){const x0=0.51,x1=-0.13;
+ return t=>{const x=lerp(x0,x1,t),e=Math.max(Math.pow(Math.max(Math.sin(Math.PI*clamp(t,0,1)),0),0.22),0.02);
+  return {x,y:topTubeY(x)-0.004+0.008*(1-t),z:zc,w:0.084*e+0.0005,h:(0.102+0.020*(1-t))*e,e:2.5};};}
 function onSide(sec,t,k,side,off){const s=sec(t);const zz=s.w*Math.pow(Math.max(1-Math.pow(Math.abs(k),s.e),0),1/s.e);return [s.x,s.y+k*s.h,s.z+side*(zz+off)];}
 function tankBody(zc,side){const sec=tankSec(zc);
  col(C.body,MAT.BODY);loft(44,44,sec);
@@ -497,6 +511,35 @@ function ibeam(a,b,depth,flange,t){const d=norm(sub(b,a)),p=[-d[1],d[0],0],L=len
  obox(c,d,p,L,depth,t);for(const s of [-1,1])obox(add(c,scl(p,s*depth/2)),d,p,L,t,flange);}
 /* flat emblem polygons placed on the tank side */
 function emblemAt(side,fn){const sec=tankSec(side*0.066);const pc=onSide(sec,0.47,0.05,side,0.0035);withXF(M4.mul(M4.cols([1,0,0],[0,1,0],[0,0,side],pc),M4.scale(1.35,1.35,1)),fn);}
+const GLYPH={
+ H:{w:0.78,s:[[[0.06,0.02],[0.02,0.22],[0.1,0.55],[0.04,0.98],[0.18,0.88]],[[0.14,0.5],[0.36,0.6],[0.58,0.42]],[[0.52,0.05],[0.62,0.38],[0.54,0.98],[0.74,0.72]]]},
+ A:{w:0.66,s:[[[0.04,0.3],[0.16,0.08],[0.3,0.34],[0.2,0.64],[0.34,1.0],[0.52,0.55],[0.4,0.2],[0.58,0.05]],[[0.22,0.42],[0.44,0.36]]]},
+ R:{w:0.62,s:[[[0.08,0.02],[0.16,0.48],[0.08,1.02]],[[0.16,0.64],[0.38,1.0],[0.54,0.74],[0.3,0.5],[0.56,0.04]]]},
+ L:{w:0.42,s:[[[0.08,0.04],[0.18,0.22],[0.1,0.72],[0.04,1.16],[0.22,0.96]]]},
+ E:{w:0.56,s:[[[0.5,0.8],[0.3,1.02],[0.08,0.74],[0.18,0.48],[0.42,0.54],[0.22,0.28],[0.06,0.12],[0.3,0.0],[0.52,0.16]]]},
+ Y:{w:0.62,s:[[[0.02,1.02],[0.22,0.55],[0.16,0.16],[0.3,-0.3],[0.46,-0.06]],[[0.58,1.02],[0.32,0.52]]]},
+ D:{w:0.7,s:[[[0.1,0.02],[0.16,0.5],[0.08,1.0]],[[0.16,0.9],[0.44,1.04],[0.64,0.55],[0.52,0.12],[0.18,0.0]]]},
+ I:{w:0.32,s:[[[0.02,0.14],[0.16,0.02],[0.1,0.48],[0.18,1.0],[0.04,0.86]]]},
+ V:{w:0.58,s:[[[0.02,1.02],[0.2,0.38],[0.32,0.02],[0.48,0.48],[0.58,1.02]]]},
+ S:{w:0.54,s:[[[0.46,0.9],[0.24,1.04],[0.06,0.74],[0.2,0.52],[0.42,0.44],[0.52,0.2],[0.3,0.0],[0.06,0.14]]]},
+ O:{w:0.58,s:[[[0.3,1.02],[0.08,0.72],[0.12,0.26],[0.34,0.0],[0.54,0.28],[0.48,0.76],[0.28,1.02]]]},
+ N:{w:0.66,s:[[[0.08,0.02],[0.14,0.52],[0.08,1.02]],[[0.14,0.84],[0.32,0.36],[0.46,0.02]],[[0.4,0.16],[0.52,0.55],[0.46,1.02]]]}
+};
+function hdScript(scH,scD,goldOnly){
+ const line=(text,sc,yBase)=>{
+  let width=0;const items=[];
+  for(const ch of text){const g=GLYPH[ch];if(!g)continue;items.push([g,width]);width+=(g.w+0.26)*sc;}
+  const x0=-width/2;
+  for(const pass of (goldOnly?[0]:[0,1])){
+   col(pass?C.red:C.gold,MAT.PAINT);
+   const rad=sc*(pass?0.155:0.235), z=pass?0.0032:0.001;
+   for(const [g,gx] of items)for(const stroke of g.s){
+    const pts=stroke.map(([px,py])=>[x0+gx+(px+py*0.26)*sc, yBase+py*sc, z]);
+    tube(pts.length>=3?smooth(pts,3):pts, Math.max(rad,0.00115), 4, false, true);}}
+ };
+ line('HARLEY',scH,scD*0.55);line('DAVIDSON',scD,-scD*1.15);}
+function scriptAt(side,scH,scD,goldOnly){const sec=tankSec(side*0.066);const pc=onSide(sec,0.50,0.0,side,0.0034);
+ withXF(M4.cols([side,0,0],[0,1,0],[0,0,side],pc),()=>hdScript(scH,scD,goldOnly));}
 const BUILD={
  frame(){col(C.body,MAT.FRAME);const r=0.017;
   tube([H1,H2],0.026,16);
@@ -504,56 +547,74 @@ const BUILD={
   for(const s of [-1,1]){ // double down tubes
    tube(smooth([add(H2,[-0.01,0.015,s*0.012]),[0.49,0.62,s*0.042],[0.40,0.31,s*0.05],[0.34,0.17,s*0.06]],6),r,12);
    tube(smooth([[0.34,0.17,s*0.06],[0.29,0.125,s*0.062],[-0.15,0.12,s*0.062],[-0.24,0.17,s*0.03]],6),r,12);
-   tube(smooth([[-0.18,0.86,0],[-0.24,0.81,s*0.05],[-0.71,0.345,s*0.09]],5),r*0.85,10);
-   tube(smooth([[-0.235,0.19,0],[-0.3,0.2,s*0.062],[-0.71,0.312,s*0.09]],5),r*0.85,10);
-   obox([-0.72,0.326,s*0.092],[1,0,0],[0,1,0],0.075,0.055,0.012);}
+   tube(smooth([[-0.18,0.86,0],[-0.24,0.81,s*0.05],[R[0]+0.012,0.345,s*0.095]],5),r*0.9,10);
+   tube(smooth([[-0.235,0.19,0],[-0.3,0.2,s*0.062],[R[0]+0.012,0.312,s*0.095]],5),r*0.9,10);
+   obox([R[0],0.326,s*0.098],[1,0,0],[0,1,0],0.08,0.058,0.014);}
   tube([S1,S2],0.021,14);
   for(const p of [H1,H2,S1,[-0.235,0.18,0]])latheAt(add(p,[0,-0.025,0]),[0,1,0],[[0,0],[0.027,0.005],[0.029,0.025],[0.027,0.045],[0,0.05]],14);
   obox([0.24,0.15,0],[1,0,0],[0,1,0],0.06,0.04,0.135);obox([-0.10,0.15,0],[1,0,0],[0,1,0],0.06,0.04,0.135);
   col(C.park,MAT.ALU);cylAB([0.25,0.17,-0.1],[0.25,0.17,0.1],0.008,8);},
- fork(){for(const z of [-0.074,0.074]){col(C.body,MAT.FRAME);
-   ibeam([0.556,1.03,z],[0.738,0.37,z],0.032,0.026,0.006);   // rigid legs
-   ibeam([0.672,0.99,z],[0.842,0.36,z],0.026,0.022,0.0055);  // sprung legs
-   col(C.park,MAT.ALU);withXF(M4.trans(0,0,z),()=>extrude([[0.73,0.39],[0.855,0.378],[0.86,0.335],[0.77,0.292],[0.725,0.335]],-0.007,0.007));
-   col(C.nickel,MAT.CHROME);for(const p of [[0.738,0.37],[0.842,0.36]])cylAB([p[0],p[1],z-0.016],[p[0],p[1],z+0.016],0.01,10);}
+ fork(){const x=F[0];for(const z of [-0.074,0.074]){col(C.body,MAT.FRAME);
+   ibeam([0.556,1.03,z],[x-0.042,0.37,z],0.038,0.032,0.0065);
+   ibeam([0.672,0.99,z],[x+0.062,0.36,z],0.032,0.028,0.006);
+   col(C.park,MAT.ALU);withXF(M4.trans(0,0,z),()=>extrude([[x-0.05,0.39],[x+0.075,0.378],[x+0.08,0.335],[x-0.01,0.292],[x-0.055,0.335]],-0.007,0.007));
+   col(C.nickel,MAT.CHROME);for(const p of [[x-0.042,0.37],[x+0.062,0.36]])cylAB([p[0],p[1],z-0.016],[p[0],p[1],z+0.016],0.01,10);}
   col(C.body,MAT.FRAME);cylAB([0.672,0.99,-0.09],[0.672,0.99,0.09],0.012,10);
   obox([0.61,1.05,0],[1,-0.12,0],[0.12,1,0],0.17,0.024,0.19);obox([0.556,1.085,0],[1,0,0],[0,1,0],0.05,0.03,0.06);
   for(const z of [-0.036,0.036]){col(C.park,MAT.ALU);tube([[0.675,0.995,z],[0.625,1.17,z]],0.006,8);
    helix([0.671,1.0,z],[0.647,1.045,z],0.018,4,0.003);helix([0.652,1.07,z],[0.631,1.155,z],0.018,6,0.0032);
    col(C.nickel,MAT.CHROME);latheAt([0.625,1.165,z],[-0.28,1,0],[[0,0],[0.012,0],[0.012,0.012],[0,0.014]],12);}
   col(C.park,MAT.ALU);obox([0.639,1.16,0],[1,0,0],[0,1,0],0.035,0.012,0.1);},
- ridecontrol(){for(const z of [-0.094,0.094]){const a=[0.80,0.43,z],b=[0.655,0.86,z],d=norm(sub(b,a)),p=[-d[1],d[0],0];
+ ridecontrol(){for(const z of [-0.094,0.094]){const a=[F[0]+0.02,0.43,z],b=[0.655,0.86,z],d=norm(sub(b,a)),p=[-d[1],d[0],0];
    col(C.park,MAT.ALU);obox(lerp3(a,b,0.5),d,p,len(sub(b,a)),0.024,0.005);
    col(C.iron,MAT.MATTE);obox(add(lerp3(a,b,0.5),[0,0,Math.sign(z)*0.003]),d,p,len(sub(b,a))*0.7,0.009,0.002);
    col(C.nickel,MAT.CHROME);for(const t of [0.04,0.96])cylAB(add(lerp3(a,b,t),[0,0,-Math.sign(z)*0.008]),add(lerp3(a,b,t),[0,0,Math.sign(z)*0.01]),0.007,8);}
   const m=lerp3([0.80,0.43,-0.094],[0.655,0.86,-0.094],0.5);col(C.black,MAT.PAINT);
   latheAt(add(m,[0,0,-0.004]),[0,0,-1],[[0,0],[0.022,0],[0.024,0.006],[0.024,0.016],[0.012,0.022],[0.008,0.034],[0,0.034]],20,XH);
   col(C.nickel,MAT.CHROME);for(let i=0;i<4;i++){const a=i/4*TAU;obox(add(m,[0.026*Math.cos(a),0.026*Math.sin(a),-0.014]),[Math.cos(a),Math.sin(a),0],[0,0,1],0.008,0.006,0.012);}},
- headlamp(){const o=[0.775,1.02,0];
+ headlamp(k){if(k==='twins'){const x=F[0]+0.01;
+  for(const z of [-0.112,0.112]){const o=[x,1.045,z];
+   col(C.black,MAT.PAINT);latheAt(o,[1,0,0],[[0,-0.07],[0.03,-0.064],[0.046,-0.044],[0.054,-0.018],[0.056,0],[0.056,0.01]],28);
+   col(C.nickel,MAT.CHROME);latheAt(o,[1,0,0],[[0.056,0.01],[0.062,0.014],[0.062,0.022],[0.05,0.026]],28);
+   col(C.lens,MAT.GLOW);latheAt(o,[1,0,0],[[0.05,0.024],[0.032,0.032],[0,0.036]],28);
+   col(C.park,MAT.ALU);cylAB([x-0.09,1.04,z*0.45],[x-0.03,1.045,z],0.008,8);}
+  obox([x-0.11,1.04,0],[1,0,0],[0,1,0],0.02,0.02,0.17);
+  const o=[x-0.02,0.90,0];
+  col(C.body,MAT.BODY);latheAt(o,Z,[[0,-0.145],[0.046,-0.145],[0.054,-0.13],[0.054,0.13],[0.046,0.145],[0,0.145]],26,XH);
+  col(C.park,MAT.ALU);latheAt(o,Z,[[0,-0.15],[0.022,-0.15],[0.022,-0.142],[0,-0.142]],14,XH);latheAt(o,Z,[[0,0.142],[0.022,0.142],[0.022,0.15],[0,0.15]],14,XH);
+  col(C.gold,MAT.PAINT);const arc=[];for(let i=0;i<=16;i++){const a=Math.PI*i/16;arc.push([o[0]+0.014*Math.sin(a),o[1]+0.032*Math.sin(a),Math.cos(a)*0.1]);}tube(arc,0.0017,5,false,true);
+  col(C.park,MAT.ALU);for(const z of [-0.08,0.08])cylAB([x-0.12,1.0,z],[o[0],o[1],z*0.55],0.006,8);
+  return;}
+ const o=[F[0]-0.005,1.025,0];
   col(C.black,MAT.PAINT);latheAt(o,[1,0,0],[[0,-0.085],[0.035,-0.08],[0.058,-0.058],[0.07,-0.03],[0.074,0],[0.074,0.01]],32);
   col(C.nickel,MAT.CHROME);latheAt(o,[1,0,0],[[0.074,0.01],[0.08,0.013],[0.08,0.022],[0.068,0.026]],32);
   col(C.lens,MAT.GLOW);latheAt(o,[1,0,0],[[0.068,0.025],[0.045,0.033],[0,0.036]],32);
-  col(C.park,MAT.ALU);obox([0.69,1.0,0],[1,0.2,0],[0,1,0],0.06,0.02,0.05);
+  col(C.park,MAT.ALU);obox([o[0]-0.085,1.005,0],[1,0.2,0],[0,1,0],0.06,0.02,0.05);
   col(C.black,MAT.PAINT);latheAt(add(o,[0,0.075,0]),[0,1,0],[[0,0],[0.008,0],[0.008,0.02],[0,0.022]],10);},
- horn(k){const o=[0.705,0.892,0];col(C.black,MAT.PAINT);
-  latheAt(o,[1,0,0],[[0,-0.05],[0.032,-0.05],[0.036,-0.03],[0.036,0.0],[0.022,0.01],[0.022,0.04],[0.042,0.07],[0.046,0.076]],28);
-  col(C.park,MAT.ALU);cylAB([0.67,0.9,-0.068],[0.67,0.9,0.068],0.006,8);obox([0.68,0.892,0],[1,0,0],[0,1,0],0.04,0.01,0.02);
-  const f=add(o,[0.077,0,0]);
+ horn(k){const mid=k==='plain',sc=mid?0.74:1,o=mid?[F[0]-0.03,1.02,0]:[0.705,0.892,0];col(C.black,MAT.PAINT);
+  latheAt(o,[1,0,0],[[0,-0.05*sc],[0.032*sc,-0.05*sc],[0.036*sc,-0.03*sc],[0.036*sc,0],[0.022*sc,0.01*sc],[0.022*sc,0.04*sc],[0.042*sc,0.07*sc],[0.046*sc,0.076*sc]],28);
+  col(C.park,MAT.ALU);cylAB([o[0]-0.04,o[1],-0.06],[o[0]-0.04,o[1],0.06],0.006,8);obox([o[0]-0.02,o[1],0],[1,0,0],[0,1,0],0.04,0.01,0.02);
+  const f=add(o,[0.077*sc,0,0]);
   if(k==='sunburst'){col(C.nickel,MAT.CHROME);disc(f,[1,0,0],0.047,0.004,40);
    col(C.black,MAT.PAINT);for(let i=0;i<16;i++){const a=i/16*TAU,d=[0,Math.cos(a),Math.sin(a)];obox(add(f,add(scl(d,0.026),[0.0045,0,0])),d,[1,0,0],0.034,0.0022,0.0042);}
    col(C.nickel,MAT.CHROME);latheAt(add(f,[0.004,0,0]),[1,0,0],[[0,0],[0.012,0],[0.01,0.006],[0,0.008]],20);}
-  else{col(C.black,MAT.PAINT);disc(f,[1,0,0],0.046,0.003,32);col(C.nickel,MAT.CHROME);latheAt(add(f,[0.003,0,0]),[1,0,0],[[0.046,0],[0.046,0.003],[0.04,0.004]],32);}},
- bars(){const half=s=>[[0.34,1.14,s*0.40],[0.41,1.132,s*0.33],[0.50,1.108,s*0.2],[0.56,1.098,s*0.07],[0.566,1.098,0]];
+  else{col(C.black,MAT.PAINT);disc(f,[1,0,0],0.046*sc,0.003,32);col(C.nickel,MAT.CHROME);latheAt(add(f,[0.003,0,0]),[1,0,0],[[0.046*sc,0],[0.046*sc,0.003],[0.04*sc,0.004]],32);}},
+ bars(k){const half=s=>[[0.34,1.14,s*0.40],[0.41,1.132,s*0.33],[0.50,1.108,s*0.2],[0.56,1.098,s*0.07],[0.566,1.098,0]];
   col(C.black,MAT.PAINT);tube(smooth(half(-1).concat(half(1).reverse().slice(1)),6),0.0115,10,false,true);
-  col(C.rubber,MAT.MATTE);for(const s of [-1,1])tube([[0.343,1.139,s*0.397],[0.40,1.133,s*0.34]],0.017,12);
+  col(k==='cream'?C.cream:C.rubber,MAT.MATTE);for(const s of [-1,1])tube([[0.343,1.139,s*0.397],[0.40,1.133,s*0.34]],0.017,12);
   col(C.nickel,MAT.CHROME);for(const s of [-1,1])cylAB([0.401,1.133,s*0.339],[0.408,1.132,s*0.332],0.0185,12);},
- cyl(){for(const [B,A] of [[B1,A1],[B2,A2]]){const M=basisY(B,A,Z);
-  const p=[[0,-0.01],[0.066,-0.01],[0.066,0.012],[0.054,0.014]];let h=0.022;for(let i=0;i<10;i++){p.push([0.054,h],[0.085,h+0.002],[0.085,h+0.007],[0.054,h+0.009]);h+=0.0165;}p.push([0.054,0.19],[0,0.19]);
-  col(C.iron,MAT.PAINT);withXF(M,()=>lathe(p,32));
-  const hp=[[0,0.186],[0.074,0.186]];let g=0.19;for(let i=0;i<6;i++){hp.push([0.074,g],[0.094,g+0.002],[0.094,g+0.0065],[0.074,g+0.0085]);g+=0.0125;}hp.push([0.064,g+0.004],[0,g+0.006]);
-  col(C.alu,MAT.ALU);withXF(M,()=>withXF(M4.mul(M4.trans(0.026,0,0),M4.scale(1.36,1,1)),()=>lathe(hp,32)));
-  for(const sx of [-0.03,0.03])for(const sz of [-0.05,0.05]){col(C.nickel,MAT.CHROME);withXF(M,()=>latheAt([0.026+sx*1.6,g+0.004,sz],[0,1,0],[[0,0],[0.0055,0],[0.0055,0.012],[0,0.013]],8));}
-  const tp=add(B,scl(A,0.27));col(C.nickel,MAT.CHROME);latheAt(tp,A,[[0,0],[0.011,0],[0.011,0.012],[0.007,0.014]],14);
+ cyl(k){const dense=k==='dense',nB=dense?14:11,nH=dense?12:9,stepB=dense?0.0122:0.0150,stepH=dense?0.0070:0.0092;
+ for(const [B,A] of [[B1,A1],[B2,A2]]){const M=basisY(B,A,Z);
+  const p=[[0,-0.01],[0.066,-0.01],[0.066,0.012],[0.052,0.014]];let h=0.020;
+  for(let i=0;i<nB;i++){p.push([0.052,h],[0.088,h+0.0015],[0.088,h+0.0052],[0.052,h+0.0067]);h+=stepB;}
+  p.push([0.052,h+0.004],[0,h+0.004]);
+  col(C.black,MAT.PAINT);withXF(M,()=>lathe(p,36));
+  const base=h+0.004;const hp=[[0,base-0.004],[0.076,base-0.004]];let g=base;
+  for(let i=0;i<nH;i++){hp.push([0.076,g],[0.114,g+0.0013],[0.114,g+0.004],[0.076,g+0.0053]);g+=stepH;}
+  hp.push([0.066,g+0.003],[0,g+0.005]);
+  col(C.black,MAT.PAINT);withXF(M,()=>withXF(M4.mul(M4.trans(0.030,0,0),M4.scale(1.44,1,1)),()=>lathe(hp,36)));
+  for(const sx of [-0.03,0.03])for(const sz of [-0.05,0.05]){col(C.nickel,MAT.CHROME);withXF(M,()=>latheAt([0.030+sx*1.55,g+0.004,sz],[0,1,0],[[0,0],[0.0055,0],[0.0055,0.012],[0,0.013]],8));}
+  const tp=add(B,scl(A,g+0.012));col(C.nickel,MAT.CHROME);latheAt(tp,A,[[0,0],[0.011,0],[0.011,0.012],[0.007,0.014]],14);
   col(C.porcelain,MAT.PAINT);latheAt(add(tp,scl(A,0.014)),A,[[0.007,0],[0.0065,0.03],[0.003,0.036],[0,0.037]],14);}},
  crank(){col(C.alu,MAT.ALU);latheAt(CR,Z,[[0,-0.086],[0.12,-0.082],[0.138,-0.07],[0.145,-0.042],[0.145,0.042],[0.138,0.07],[0.12,0.082],[0,0.086]],44,XH);
   for(const [B,A] of [[B1,A1],[B2,A2]])latheAt(sub(B,scl(A,0.03)),A,[[0,0],[0.076,0],[0.076,0.022],[0.066,0.03],[0,0.03]],28,Z);
@@ -661,22 +722,32 @@ const BUILD={
  tank(){tankBody(0.066,1);},
  oiltank(){const sec=tankBody(-0.066,-1);const s=sec(0.82);col(C.nickel,MAT.CHROME);latheAt([s.x,s.y+s.h-0.01,-0.042],[0,1,0],[[0.013,0],[0.013,0.05],[0.007,0.055],[0.007,0.072]],14);
   col(C.black,MAT.PAINT);latheAt([s.x,s.y+s.h+0.06,-0.042],[0,1,0],[[0,0],[0.014,0.002],[0.014,0.012],[0,0.016]],14);},
- graphics(k,side){if(k==='none')return;emblemAt(side,()=>{
-  if(k==='bird'){ // stylised Art Deco bird, beak forward
-   col(C.gold,MAT.CHROME);extrude([[0.062,0.004],[0.03,0.014],[-0.02,0.012],[-0.055,0.004],[-0.05,-0.004],[0.0,-0.008],[0.045,-0.004]],0,0.0016);
-   extrude([[0.02,0.011],[-0.035,0.058],[-0.05,0.054],[-0.022,0.012]],0,0.0018);
-   extrude([[0.008,0.012],[-0.05,0.04],[-0.062,0.034],[-0.03,0.01]],0,0.0014);
-   extrude([[0.0,-0.006],[-0.045,-0.03],[-0.056,-0.026],[-0.025,-0.004]],0,0.0016);
-   col(C.red,MAT.PAINT);extrude([[0.074,0.003],[0.06,0.008],[0.058,-0.002]],0,0.0022);
-   for(let i=0;i<3;i++){col(C.cream,MAT.PAINT);box(-0.085-i*0.022,0.0-i*0.004,0.0008,0.03-i*0.006,0.0028,0.0016);}}
-  else{ // diamond logo
-   col(C.cream,MAT.PAINT);extrude([[0.058,0],[0,0.034],[-0.058,0],[0,-0.034]],0,0.0016);
-   col(C.red,MAT.PAINT);extrude([[0.048,0],[0,0.027],[-0.048,0],[0,-0.027]],0,0.0022);
-   col(C.black,MAT.PAINT);box(0,0,0.0024,0.07,0.012,0.0012);
-   col(C.gold,MAT.CHROME);box(0,0,0.0029,0.064,0.0018,0.0009);}});},
- ffender(){fender(F,0.32,2.8,0.37,0.07);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[F[0]+0.37*Math.cos(0.5),F[1]+0.37*Math.sin(0.5),s*0.072],[F[0]+0.02,F[1]+0.01,s*0.08]],0.005,6);
-   tube([[F[0]+0.37*Math.cos(2.4),F[1]+0.37*Math.sin(2.4),s*0.072],[F[0]-0.02,F[1]+0.01,s*0.08]],0.005,6);}},
- rfender(){fender(R,0.95,3.55,0.37,0.076);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[R[0]+0.37*Math.cos(2.9),R[1]+0.37*Math.sin(2.9),s*0.078],[R[0]-0.01,R[1]+0.01,s*0.092]],0.005,6);tube([[R[0]+0.37*Math.cos(1.4),R[1]+0.37*Math.sin(1.4),s*0.078],[-0.46,0.58,s*0.08]],0.005,6);}},
+ graphics(k,side){if(k==='script'){scriptAt(side,0.021,0.0155,false);return;}
+ emblemAt(side,()=>{
+  if(k==='bird'){
+   col([0.74,0.07,0.045],MAT.PAINT);extrude([[0.088,0],[0.05,0.036],[0.0,0.05],[-0.058,0.042],[-0.098,0.02],[-0.104,0],[-0.098,-0.02],[-0.058,-0.042],[0,-0.05],[0.05,-0.036]],0.0006,0.0026);
+   col(C.gold,MAT.CHROME);tube([[0.088,0,0.0028],[0.05,0.036,0.0028],[0,0.05,0.0028],[-0.058,0.042,0.0028],[-0.098,0.02,0.0028],[-0.104,0,0.0028],[-0.098,-0.02,0.0028],[-0.058,-0.042,0.0028],[0,-0.05,0.0028],[0.05,-0.036,0.0028]],0.0016,4,true);
+   extrude([[0.062,0.004],[0.03,0.014],[-0.02,0.012],[-0.055,0.004],[-0.05,-0.004],[0.0,-0.008],[0.045,-0.004]],0.002,0.0036);
+   extrude([[0.02,0.011],[-0.035,0.058],[-0.05,0.054],[-0.022,0.012]],0.0022,0.0038);
+   extrude([[0.008,0.012],[-0.05,0.04],[-0.062,0.034],[-0.03,0.01]],0.002,0.0034);
+   extrude([[0.0,-0.006],[-0.045,-0.03],[-0.056,-0.026],[-0.025,-0.004]],0.002,0.0036);
+   extrude([[0.074,0.003],[0.06,0.008],[0.058,-0.002]],0.0024,0.004);
+   withXF(M4.mul(M4.trans(0,-0.062,0.002),M4.scale(side,1,1)),()=>hdScript(0.013,0.010,true));}
+  else{
+   col(C.gold,MAT.CHROME);
+   extrude([[-0.022,0.006],[-0.125,0.014],[-0.132,-0.004],[-0.024,-0.01]],0.0004,0.0022);
+   extrude([[0.022,0.006],[0.125,0.014],[0.132,-0.004],[0.024,-0.01]],0.0004,0.0022);
+   extrude([[-0.02,0.008],[-0.09,0.026],[-0.098,0.008],[-0.022,0.0]],0.0006,0.0024);
+   extrude([[0.02,0.008],[0.09,0.026],[0.098,0.008],[0.022,0.0]],0.0006,0.0024);
+   extrude([[-0.018,-0.002],[-0.105,-0.02],[-0.112,-0.004],[-0.02,0.002]],0.0005,0.002);
+   extrude([[0.018,-0.002],[0.105,-0.02],[0.112,-0.004],[0.02,0.002]],0.0005,0.002);
+   col(C.cream,MAT.PAINT);extrude([[0.034,0],[0,0.026],[-0.034,0],[0,-0.026]],0.0012,0.0028);
+   col(C.red,MAT.PAINT);extrude([[0.024,0],[0,0.018],[-0.024,0],[0,-0.018]],0.0024,0.0038);
+   col(C.gold,MAT.CHROME);extrude([[0.01,0],[0,0.007],[-0.01,0],[0,-0.007]],0.0034,0.0044);
+   withXF(M4.mul(M4.trans(0,-0.05,0.002),M4.scale(side,1,1)),()=>hdScript(0.012,0.009,false));}});},
+ ffender(){fender(F,0.32,2.8,0.41,0.09);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[F[0]+0.41*Math.cos(0.5),F[1]+0.41*Math.sin(0.5),s*0.092],[F[0]+0.02,F[1]+0.01,s*0.1]],0.005,6);
+   tube([[F[0]+0.41*Math.cos(2.4),F[1]+0.41*Math.sin(2.4),s*0.092],[F[0]-0.02,F[1]+0.01,s*0.1]],0.005,6);}},
+ rfender(){fender(R,0.95,3.55,0.415,0.098);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[R[0]+0.41*Math.cos(2.9),R[1]+0.41*Math.sin(2.9),s*0.1],[R[0]-0.01,R[1]+0.01,s*0.11]],0.005,6);tube([[R[0]+0.41*Math.cos(1.4),R[1]+0.41*Math.sin(1.4),s*0.1],[-0.48,0.58,s*0.1]],0.005,6);}},
  tail(k){const a=2.42,o=[R[0]+0.40*Math.cos(a),R[1]+0.40*Math.sin(a)+0.014,0];col(C.black,MAT.PAINT);obox(add(o,[0.01,-0.024,0]),[1,0,0],[0,1,0],0.035,0.02,0.012);
   if(k==='airflow'){ // streamlined teardrop
    col(C.nickel,MAT.CHROME);loft(20,20,t=>{const x=lerp(o[0]+0.03,o[0]-0.085,t),e=Math.pow(Math.max(Math.sin(Math.PI*clamp(t*0.98+0.01,0,1)),0),0.5)*(0.35+0.65*t);return {x,y:o[1]+0.004,z:0,w:0.03*e+0.0005,h:0.024*e+0.0005,e:2.2};});
@@ -689,10 +760,15 @@ const BUILD={
   col(C.lens,MAT.GLOW);obox(add(o,[-0.012,-0.034,0]),[1,0,0],[0,1,0],0.02,0.006,0.025);}
 };
 /* parts whose shape changes with the Year control */
+function gripPick(){const p=PAINTS[paintIdx];let d=0;for(let i=0;i<3;i++)d+=Math.abs(p.tone[i]-p.body[i]);return (year===1936||d>0.15)?'cream':'rubber';}
+function paintForYear(y){return y>=1936?'venetian':(y>=1933?'mandarin':'olive');}
 const ALTS={
- graphics:{keys:['none','bird','diamond'],pick:y=>y<1933?'none':(y===1933?'bird':'diamond')},
+ graphics:{keys:['script','bird','winged'],pick:y=>y<1933?'script':(y===1933?'bird':'winged')},
  horn:{keys:['plain','sunburst'],pick:y=>y<1931?'plain':'sunburst'},
- tail:{keys:['plain','airflow','beehive'],pick:y=>y<1934?'plain':(y===1934?'airflow':'beehive')}
+ tail:{keys:['plain','airflow','beehive'],pick:y=>y<1934?'plain':(y===1934?'airflow':'beehive')},
+ headlamp:{keys:['single','twins'],pick:y=>y===1930?'twins':'single'},
+ cyl:{keys:['std','dense'],pick:y=>y===1936?'dense':'std'},
+ bars:{keys:['rubber','cream'],pick:()=>gripPick()}
 };
 /* explode offsets (metres), outward along each system's axis */
 const EX={
@@ -791,7 +867,7 @@ const cam={yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()},goal={
 let explodeTarget=Q.get('explode')==='1'?1:0,explodeCur=explodeTarget,autoRotate=true,lastInput=-1e9,selected=null,hovered=null,variantSel=null,lensShift=0,lensGoal=0,confOpen=false;
 if(explodeTarget){cam.dist=goal.dist=4.8;cam.t=goal.t=[0.02,0.6,0];}
 let year=YEARS.includes(+Q.get('year'))?+Q.get('year'):1936;
-let paintIdx=Math.max(0,PAINTS.findIndex(p=>p.id===(Q.get('paint')||'venetian')));
+let paintIdx=Math.max(0,PAINTS.findIndex(p=>p.id===(Q.get('paint')||paintForYear(year))));
 const curPaint={body:PAINTS[paintIdx].body.slice(),frame:PAINTS[paintIdx].frame.slice(),tone:PAINTS[paintIdx].tone.slice()};
 let W=1,H=1,DPR=1;
 function resize(){const r=stage.getBoundingClientRect();W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));DPR=Math.min(window.devicePixelRatio||1,2);
@@ -837,7 +913,7 @@ function confHTML(id,compact){const c=CONFLICTS[id];
  return `<div class="conf"><h3>⚠ Source conflict</h3><h4>${esc(c.title)}</h4><div class="kd">${esc(c.kind)}</div><p><b>One side:</b> ${esc(c.a)}</p><p><b>Other side:</b> ${esc(c.b)}</p><p>${esc(c.res)}</p></div>`;}
 function panelHTML(d,o){o=o||{};const sys=SYS[d.sys];
  const head=`<button class="x" aria-label="Close">×</button><div class="chip" style="color:${sys.col}">${esc(sys.name)}</div><h2>${esc(d.name)}</h2>`;
- if(d.nodata)return head+`<div class="nodata">${esc(NODATA)}</div>`;
+ if(d.nodata)return head+`<div class="nodata">${esc(NODATA)}</div>`+(d.note?`<div class="note">${esc(d.note)}</div>`:'');
  const specs=o.max?d.specs.slice(0,o.max):d.specs;const work=d.work&&!o.noWork?(o.maxWork?d.work.slice(0,o.maxWork):d.work):null;
  const conf=d.conf&&!o.noConf?(o.maxConf?d.conf.slice(0,o.maxConf):d.conf):null;
  return head+`<ul>${specs.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
@@ -871,8 +947,9 @@ function setYear(y){year=y;for(const id of Object.keys(ALTS)){const p=PID[id];p.
 function paintLabel(){$('bFinish').textContent='Paint: '+PAINTS[paintIdx].name;}
 $('bExplode').onclick=()=>setExplode(!explodeTarget);
 $('bRotate').onclick=()=>{autoRotate=!autoRotate;$('bRotate').classList.toggle('on',autoRotate);};
-$('bYear').onclick=()=>{setYear(YEARS[(YEARS.indexOf(year)+1)%YEARS.length]);if(!selected&&variantSel===null&&!confOpen){showPanel(yearsHTML(year));lensGoal=W>760?-0.24:0;PARTS.forEach(q=>q.sel=['tank','oiltank','graphics','horn','tail'].includes(q.id)?1:0);}};
-$('bFinish').onclick=()=>{paintIdx=(paintIdx+1)%PAINTS.length;paintLabel();};paintLabel();
+function syncBars(){const b=PID.bars;if(b)b.draws=b.vars[gripPick()];totalVerts=countVerts();}
+$('bYear').onclick=()=>{setYear(YEARS[(YEARS.indexOf(year)+1)%YEARS.length]);syncBars();if(!selected&&variantSel===null&&!confOpen){showPanel(yearsHTML(year));lensGoal=W>760?-0.24:0;PARTS.forEach(q=>q.sel=['tank','oiltank','graphics','horn','tail','headlamp'].includes(q.id)?1:0);}};
+$('bFinish').onclick=()=>{paintIdx=(paintIdx+1)%PAINTS.length;paintLabel();syncBars();};paintLabel();
 $('bConf').onclick=openConflicts;
 $('bReset').onclick=()=>{select(null);setExplode(false);Object.assign(goal,{yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()});};
 $('bParts').onclick=()=>{$('partsDrawer').classList.toggle('open');$('bParts').classList.toggle('on');};
@@ -930,7 +1007,7 @@ const EXPL_END={yaw:0.72,pitch:0.3,dist:4.6,t:[0.02,0.63,0]};
 const WIDE={yaw:0.6,pitch:0.18,dist:3.0,t:[0.02,0.56,0]};
 const SK=7; // styling stop index
 function styleAt(u){ // year + paint during the styling stop
- if(u<0.9)return {y:1931,p:'olive'};if(u<1.8)return {y:1933,p:'olive'};if(u<2.7)return {y:1934,p:'olive'};if(u<3.6)return {y:1935,p:'olive'};
+ if(u<0.9)return {y:1931,p:'olive'};if(u<1.8)return {y:1933,p:'mandarin'};if(u<2.7)return {y:1934,p:'mandarin'};if(u<3.6)return {y:1935,p:'mandarin'};
  if(u<4.8)return {y:1936,p:'venetian'};return {y:1936,p:'maroon'};}
 function tourAt(t,first){const o={cam:null,explode:0,sel:[],panel:null,cap:null,card:null,cardA:0,stop:-1,capA:0,panA:0,year:1936,paint:'venetian'};
  if(t<TT.title){o.cam={yaw:TC0.yaw+0.04*t,pitch:TC0.pitch,dist:TC0.dist,t:TC0.t};o.card='title';o.cardA=(first&&t<0.7?t/0.7:1)*(t>3.8?1-(t-3.8)/0.7:1);}
@@ -955,7 +1032,9 @@ function stopPanel(k){const s=STOPS[k];
  if(s.id==='styling')return yearsHTML(year,{noX:true});
  if(s.id==='cyl')return panelHTML(DATA.cyl,{max:5,noConf:true,noNote:true})+confHTML('bore',true);
  return panelHTML(DATA[s.id],{max:4,maxWork:1,noNote:true,noConf:true});}
-function stopSub(k){const s=STOPS[k];if(s.id!=='styling')return s.sub;return STYLE_SUB[year]+(year===1936?PAINTS[paintIdx].name:'');}
+function stopSub(k){const s=STOPS[k];if(s.id!=='styling')return s.sub;
+ if(year>=1933&&year<1936)return STYLE_SUB[year]+' · '+PAINTS[paintIdx].name;
+ return STYLE_SUB[year]+(year===1936?PAINTS[paintIdx].name:'');}
 const cap=$('caption'),card=$('card');let curCap='',curCard=null,panelKey='';
 function setCard(kind){if(curCard===kind)return;curCard=kind;const k=card.querySelector('.k'),h=card.querySelector('h1'),s=card.querySelector('.s');
  h.textContent='Anatomy of the Harley-Davidson V / VL, 1930–1936';
@@ -970,7 +1049,7 @@ let last=CAPTURE?-1000/30:performance.now();const tourStart=CAPTURE?0:performanc
 function frame(now){const dt=Math.min(0.05,Math.max(0,(now-last)/1000));last=now;timeSec=now/1000;
  if(TOUR){let tt=FREEZE?T0:T0+(now-tourStart)/1000;const first=!CAPTURE&&tt<TT.end;tt=tt%TT.end;const o=tourAt(tt,first);
   cam.yaw=o.cam.yaw;cam.pitch=o.cam.pitch;cam.dist=o.cam.dist;cam.t=o.cam.t;explodeCur=o.explode;
-  if(o.year!==year)setYear(o.year);const pi=PAINTS.findIndex(p=>p.id===o.paint);if(pi!==paintIdx)paintIdx=pi;
+  if(o.year!==year)setYear(o.year);const pi=PAINTS.findIndex(p=>p.id===o.paint);if(pi!==paintIdx)paintIdx=pi;syncBars();
   const anyS=o.sel.length>0,kS=FREEZE?1:1-Math.exp(-dt*6),kD=FREEZE?1:1-Math.exp(-dt*5);
   for(const p of PARTS){p.sel=o.sel.includes(p.id)?1:0;p.selA=lerp(p.selA,p.sel,kS);p.dimA=lerp(p.dimA,anyS&&!p.sel?0.55:0,kD);}
   lensGoal=o.stop>=0?(W/H<1.3?-0.34:-0.26):0;lensShift=FREEZE?lensGoal:lerp(lensShift,lensGoal,1-Math.exp(-dt*3));
