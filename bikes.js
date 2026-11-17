@@ -18,8 +18,8 @@ window.BIKES = [
     years: "1929–1931",
     year: 1929,
     spec: "45 cu in Flathead Solo",
-    blurb: "Olive-green solo with twin bullet headlights and a 45-cubic-inch side-valve V-twin.",
-    posterAlt: "Olive-green Harley-Davidson Model D with twin bullet headlights, posed on a dark studio floor.",
+    blurb: "Olive-green solo with a 45-cubic-inch side-valve V-twin. Twin bullet headlights in 1929–30, a single 7-inch lamp in 1931.",
+    posterAlt: "Olive-green 1930 Harley-Davidson Model D with twin bullet headlights and a fork toolbox, posed on a dark studio floor.",
     mindmapAlt: "NotebookLM mind map of the Model D, branching into engine, transmission, drive, frame, brakes, tanks, electrics, and variants.",
     infoAlt: "NotebookLM infographic of the Model D, 1929 to 1931, covering the flathead engine, rigid frame, drum brakes, bullet headlights, and the D, DL, DLD, and DS lineup."
   },
