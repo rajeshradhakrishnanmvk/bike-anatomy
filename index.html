@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0a08">
+  <meta name="description" content="Harley-Davidson Bike Anatomy: part-by-part WebGL studies of early Flatheads, researched in NotebookLM.">
+  <title>Bike Anatomy — Harley-Davidson</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="skip" href="#catalog">Skip to the motorcycles</a>
+  <header class="site-header hero">
+    <div class="wrap">
+      <p class="kicker">Harley-Davidson</p>
+      <div class="header-row">
+        <h1>Bike Anatomy</h1>
+        <p class="byline">A series by Rajesh Radhakrishnan</p>
+      </div>
+      <p class="intro">Part-by-part studies of the early Flatheads. Each machine is researched in NotebookLM, then drawn as a single-file 3D viewer in raw WebGL, with zero dependencies. Open a viewer, watch the silent tour, or pull the motorcycle apart.</p>
+      <hr class="rule">
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      <div class="catalog-head">
+        <h2>The motorcycles</h2>
+        <p id="count">Loading the ledger…</p>
+      </div>
+      <div id="catalog" class="grid"></div>
+      <noscript>
+        <p>Enable JavaScript to load the list from <code>bikes.js</code>.</p>
+      </noscript>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <p>Research with NotebookLM. Built with HTML5, vanilla JS, CSS and raw WebGL, zero dependencies.</p>
+      <p><a href="https://github.com/rajeshradhakrishnanmvk/bike-anatomy">github.com/rajeshradhakrishnanmvk/bike-anatomy</a></p>
+    </div>
+  </footer>
+  <script src="bikes.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
