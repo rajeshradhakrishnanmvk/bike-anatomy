@@ -34,5 +34,17 @@ window.BIKES = [
     posterAlt: "Blue-and-cream Harley-Davidson V with a single headlamp and an exposed flathead engine, posed on a dark studio floor.",
     mindmapAlt: "NotebookLM mind map of the V and VL, covering specifications, systems, model variants, and year-by-year changes from 1930 to 1936.",
     infoAlt: "NotebookLM infographic of the V-series Flathead, 1930 to 1936, with engine, transmission, frame, brakes, a production timeline, and the 74 versus 80 cubic inch specifications."
+  },
+  {
+    slug: "model-c",
+    name: "Model C",
+    family: "Single",
+    years: "1929–1934",
+    year: 1929,
+    spec: "30.50 cu in Flathead single",
+    blurb: "Olive-green 500-class side-valve single with a Ricardo head, built for solo use only. Twin headlamps and a barrel toolbox in 1930, a single lamp after that.",
+    posterAlt: "Olive-green Harley-Davidson Model C single with twin bullet headlamps, a barrel toolbox across the fork and an upright finned cylinder, posed on a dark studio floor.",
+    mindmapAlt: "NotebookLM mind map of the Model C, branching into overview, engine and drivetrain, chassis and equipment, model variants, related models, and restoration.",
+    infoAlt: "NotebookLM infographic of the 1929 to 1934 Model C, covering the 30.50 cubic inch flathead, 4,472 units produced, the shared Model D chassis, and comparisons with the Peashooter, the strap tank myth, and the Model A and B singles."
   }
 ];
