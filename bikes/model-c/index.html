@@ -106,6 +106,7 @@ body.tour #panel .yr{font-size:calc(var(--u)*15)}
 #pose label{display:flex;align-items:center;gap:calc(var(--u)*8);margin:calc(var(--u)*5) 0;font-size:calc(var(--u)*12);color:var(--mute)}
 #pose label span{min-width:calc(var(--u)*76)}
 #pose label input[type=range]{flex:1;min-width:0;accent-color:#d8b46a}
+#pose label input:disabled{opacity:.4}
 #pose label.check{gap:calc(var(--u)*8)}
 #pose label.off{opacity:.5}
 #pose .row{display:flex;flex-wrap:wrap;gap:calc(var(--u)*6);margin-top:calc(var(--u)*6)}
@@ -150,14 +151,23 @@ body.capture #bPose,body.capture #pose,body.capture #poseFile{display:none!impor
     <p id="poseEmpty">Choose a PNG, JPG, or WebP. It stands in the frame beside the motorcycle.</p>
     <div id="poseControls" hidden>
       <p class="pose-help">Drag the cutout to move it. Scroll or pinch on it to scale. Drag empty space to orbit the bike.</p>
+      <div class="row">
+        <button id="bPoseStand" type="button">Stand</button>
+        <button id="bPoseBust" type="button">Portrait</button>
+      </div>
+      <p class="pose-note" id="poseFitNote"></p>
       <label><span>Scale</span> <input id="poseScale" type="range" min="0.35" max="2.4" step="0.01" value="1" aria-label="Scale"></label>
-      <label><span>Rotate</span> <input id="poseRot" type="range" min="-180" max="180" step="1" value="28" aria-label="Rotate"></label>
+      <label><span>Rotate</span> <input id="poseRot" type="range" min="-180" max="180" step="1" value="18" aria-label="Rotate"></label>
+      <label><span>Blend</span> <input id="poseBlend" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Blend with the scene"></label>
+      <label><span>Warmth</span> <input id="poseWarm" type="range" min="-1" max="1" step="0.01" value="0" aria-label="Warmth"></label>
+      <label><span>Bright</span> <input id="poseBright" type="range" min="0.55" max="1.45" step="0.01" value="1" aria-label="Brightness"></label>
       <div class="row">
         <button id="bPoseFlip" type="button">Flip</button>
         <button id="bPoseReset" type="button">Reset pose</button>
       </div>
       <label class="check" id="poseKeyLabel"><input id="poseKey" type="checkbox"> Remove plain background</label>
       <div id="poseKeyOpts" hidden>
+        <label class="check"><input id="poseAuto" type="checkbox" checked> Auto tolerance</label>
         <label><span>Tolerance</span> <input id="poseTol" type="range" min="0" max="140" step="1" value="48" aria-label="Background tolerance"></label>
         <label class="check"><input id="poseSoft" type="checkbox" checked> Soft edge</label>
       </div>
@@ -984,11 +994,32 @@ function progUV(vs,fs){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX
  for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}return {p,u};}
 const VS_CUT=`attribute vec3 aP;attribute vec2 aUV;uniform mat4 uVP;uniform mat4 uM;varying vec2 vUV;
 void main(){vUV=aUV;gl_Position=uVP*(uM*vec4(aP,1.0));}`;
-const FS_CUT=`precision mediump float;uniform sampler2D uTex;uniform float uFlip;varying vec2 vUV;
-void main(){vec2 uv=vec2(uFlip>0.5?1.0-vUV.x:vUV.x,vUV.y);vec4 c=texture2D(uTex,uv);if(c.a<0.02)discard;gl_FragColor=c;}`;
+const VS_PHOTO=`attribute vec3 aP;attribute vec2 aUV;uniform mat4 uVP;uniform mat4 uM;varying vec2 vUV;varying vec3 vW;
+void main(){vec4 w=uM*vec4(aP,1.0);vW=w.xyz;vUV=aUV;gl_Position=uVP*w;}`;
+/* Grade the photo toward the studio: dim warm key, a little of the current paint, edge wrap. Two passes keep depth honest. */
+const FS_CUT=`precision mediump float;uniform sampler2D uTex;uniform float uFlip;uniform float uPass;uniform float uBlend;uniform float uBright;uniform float uWarm;uniform vec3 uTint;uniform vec3 uWrap;uniform vec3 uEye;varying vec2 vUV;varying vec3 vW;
+void main(){
+ vec2 uv=vec2(uFlip>0.5?1.0-vUV.x:vUV.x,vUV.y);
+ vec4 c=texture2D(uTex,uv);
+ if(uPass<0.5){if(c.a<0.68)discard;}
+ else if(c.a>=0.68||c.a<0.025)discard;
+ vec3 lin=c.a>0.001?c.rgb/c.a:c.rgb;
+ float l=dot(lin,vec3(0.30,0.59,0.11));
+ vec3 g=mix(vec3(l),lin,0.94);
+ g=(g-0.5)*0.86+0.42;
+ g*=vec3(1.02,0.97,0.90);
+ g=mix(g,g*uTint,0.22);
+ g*=mix(1.0,0.86,smoothstep(1.6,5.5,length(vW-uEye)));
+ g=clamp(g,0.0,1.0);
+ vec3 col=mix(lin,g,uBlend)*uBright;
+ vec3 bias=uWarm>=0.0?vec3(1.10,1.00,0.88):vec3(0.90,0.97,1.10);
+ col*=mix(vec3(1.0),bias,abs(uWarm));
+ col=mix(col,uWrap,smoothstep(0.92,0.10,c.a)*(0.30+0.42*uBlend));
+ col=clamp(col,0.0,1.0);
+ gl_FragColor=vec4(col*c.a,c.a);}`;
 const FS_BLOB=`precision mediump float;varying vec2 vUV;uniform float uA;
-void main(){float d=length(vUV);float a=smoothstep(1.0,0.28,d)*uA;if(a<0.012)discard;gl_FragColor=vec4(0.02,0.015,0.01,a);}`;
-const P_CUT=progUV(VS_CUT,FS_CUT),P_BLOB=progUV(VS_CUT,FS_BLOB);
+void main(){float d=length(vUV);float a=smoothstep(1.0,0.08,d)*uA;if(a<0.01)discard;gl_FragColor=vec4(0.02,0.015,0.01,a);}`;
+const P_CUT=progUV(VS_PHOTO,FS_CUT),P_BLOB=progUV(VS_CUT,FS_BLOB);
 const poseBuf=gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER,poseBuf);
 gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
@@ -999,14 +1030,21 @@ const poseBlob=gl.createBuffer();let poseBlobN=0;
 {const n=28,v=[];for(let i=0;i<n;i++){const a0=i/n*TAU,a1=(i+1)/n*TAU;
  v.push(0,0.004,0,0,0, Math.cos(a0),0.004,Math.sin(a0),Math.cos(a0),Math.sin(a0), Math.cos(a1),0.004,Math.sin(a1),Math.cos(a1),Math.sin(a1));}
  poseBlobN=v.length/5;gl.bindBuffer(gl.ARRAY_BUFFER,poseBlob);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);}
-const POSE_HOME={x:0.22,z:0.55,scale:0.82,rot:28*Math.PI/180};
-const pose={x:POSE_HOME.x,z:POSE_HOME.z,scale:1,rot:POSE_HOME.rot,flip:false,tex:null,src:null,aspect:0.5,hasAlpha:false,removeBg:false,tol:48,soft:true,key:null,placed:false};
+const POSE_HOME={x:0.42,z:0.48,scale:1,rot:18*Math.PI/180};
+const pose={x:POSE_HOME.x,z:POSE_HOME.z,scale:1,rot:POSE_HOME.rot,flip:false,tex:null,src:null,aspect:0.5,hasAlpha:false,removeBg:false,tol:48,soft:true,autoTol:true,key:null,placed:false,mode:'stand',fitLock:false,blend:0.75,warm:0,bright:1};
 let poseWork=null,poseDrag=false,poseGrab=null,posePinch=false,posePinch0=0,poseScale0=1;
 const poseSrcCanvas=document.createElement('canvas'),poseOutCanvas=document.createElement('canvas');
-function poseSize(){const h=1.72*pose.scale,w=h*(pose.aspect>0?pose.aspect:0.5);return {h,w};}
-function poseMatrix(){const s=poseSize();return M4.mul(M4.trans(pose.x,0,pose.z),M4.mul(M4.rotY(pose.rot),M4.scale(s.w,s.h,1)));}
-function poseShadowMatrix(){const s=poseSize(),rad=Math.max(0.16,s.w*0.34);return M4.mul(M4.trans(pose.x,0,pose.z),M4.scale(rad,1,rad*0.72));}
-function poseMetrics(){const s=poseSize(),c=Math.cos(pose.rot),sn=Math.sin(pose.rot);return {h:s.h,w:s.w,right:[c,0,-sn],normal:[sn,0,c]};}
+function poseLayout(){const sc=pose.scale>0?pose.scale:1,aspect=pose.aspect>0?pose.aspect:0.5;
+ if(pose.mode==='portrait'){const h=0.62*sc;return {h,w:h*aspect,base:Math.max(0.16,1.18*sc-h)};}
+ const h=1.22*sc;return {h,w:h*aspect,base:0};}
+function poseMatrix(){const s=poseLayout();return M4.mul(M4.trans(pose.x,s.base,pose.z),M4.mul(M4.rotY(pose.rot),M4.scale(s.w,s.h,1)));}
+function poseShadowMatrix(){const lay=poseLayout(),h=pose.mode==='portrait'?1.18*pose.scale:lay.h;
+ const foot=pose.mode==='portrait'?0.22*pose.scale:Math.max(0.16,lay.w*0.30);
+ const lx=LIGHT[0],ly=LIGHT[1],lz=LIGHT[2],glen=Math.hypot(lx,lz)||1,dx=lx/glen,dz=lz/glen;
+ const along=foot*1.85,across=foot*0.82,px=-dz,pz=dx;
+ return M4.cols([px*across,0,pz*across],[0,1,0],[dx*along,0,dz*along],[pose.x-lx/ly*h*0.26,0,pose.z-lz/ly*h*0.26]);}
+function poseMetrics(){const s=poseLayout(),c=Math.cos(pose.rot),sn=Math.sin(pose.rot);return {h:s.h,w:s.w,base:s.base,right:[c,0,-sn],normal:[sn,0,c]};}
+function poseTint(){const b=curPaint.body,m=Math.max(b[0],b[1],b[2],0.001);return [0.62+0.38*b[0]/m,0.62+0.38*b[1]/m,0.62+0.38*b[2]/m];}
 function screenRay(px,py){const asp=canvas.width/canvas.height,fy=asp<1.5?2*Math.atan(Math.tan(17*Math.PI/180)*1.5/asp):34*Math.PI/180;
  const eye=eyeOf(cam),backward=norm(sub(eye,cam.t)),right=norm(cross([0,1,0],backward)),yup=cross(backward,right);
  const rw=canvas.clientWidth||W,rh=canvas.clientHeight||H,ndcX=(px/rw)*2-1-lensShift,ndcY=1-(py/rh)*2;
@@ -1017,8 +1055,8 @@ function poseAlphaAt(lx,ly){const src=(pose.removeBg&&poseWork)?poseWork:pose.sr
  const x=clamp(u*src.width|0,0,src.width-1),y=clamp((1-ly)*src.height|0,0,src.height-1);
  return src.data[(y*src.width+x)*4+3];}
 function poseHit(px,py){if(!pose.tex)return null;const ray=screenRay(px,py),m=poseMetrics(),denom=dot(m.normal,ray.d);
- if(Math.abs(denom)<1e-6)return null;const p0=[pose.x,0,pose.z],t=dot(m.normal,sub(p0,ray.o))/denom;if(t<0)return null;
- const hit=add(ray.o,scl(ray.d,t)),rel=sub(hit,p0),lx=dot(rel,m.right)/m.w,ly=hit[1]/m.h;
+ if(Math.abs(denom)<1e-6)return null;const p0=[pose.x,m.base,pose.z],t=dot(m.normal,sub(p0,ray.o))/denom;if(t<0)return null;
+ const hit=add(ray.o,scl(ray.d,t)),rel=sub(hit,p0),lx=dot(rel,m.right)/m.w,ly=(hit[1]-m.base)/m.h;
  if(lx<-0.5||lx>0.5||ly<0||ly>1)return null;if(poseAlphaAt(lx,ly)<24)return null;
  return {lx,ly,y:hit[1],wx:hit[0],wz:hit[2]};}
 function movePose(px,py){if(!poseGrab)return;const ray=screenRay(px,py);if(Math.abs(ray.d[1])<1e-6)return;
@@ -1026,15 +1064,17 @@ function movePose(px,py){if(!poseGrab)return;const ray=screenRay(px,py);if(Math.
  pose.x=clamp(ray.o[0]+ray.d[0]*t+poseGrab.ox,-3.4,3.4);pose.z=clamp(ray.o[2]+ray.d[2]*t+poseGrab.oz,-3.4,3.4);}
 function drawPose(vp){if(!pose.tex||TOUR||CAPTURE)return;
  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
- gl.useProgram(P_BLOB.p);gl.uniformMatrix4fv(P_BLOB.u.uVP,false,vp);gl.uniformMatrix4fv(P_BLOB.u.uM,false,poseShadowMatrix());gl.uniform1f(P_BLOB.u.uA,0.5);
+ gl.useProgram(P_BLOB.p);gl.uniformMatrix4fv(P_BLOB.u.uVP,false,vp);gl.uniformMatrix4fv(P_BLOB.u.uM,false,poseShadowMatrix());gl.uniform1f(P_BLOB.u.uA,0.38);
  gl.bindBuffer(gl.ARRAY_BUFFER,poseBlob);gl.vertexAttribPointer(0,3,gl.FLOAT,false,20,0);gl.enableVertexAttribArray(0);
  gl.vertexAttribPointer(1,2,gl.FLOAT,false,20,12);gl.enableVertexAttribArray(1);gl.disableVertexAttribArray(2);gl.drawArrays(gl.TRIANGLES,0,poseBlobN);
- gl.depthMask(true);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
- gl.useProgram(P_CUT.p);gl.uniformMatrix4fv(P_CUT.u.uVP,false,vp);gl.uniformMatrix4fv(P_CUT.u.uM,false,poseMatrix());
- gl.uniform1f(P_CUT.u.uFlip,pose.flip?1:0);gl.uniform1i(P_CUT.u.uTex,0);
+ gl.useProgram(P_CUT.p);const u=P_CUT.u;
+ gl.uniformMatrix4fv(u.uVP,false,vp);gl.uniformMatrix4fv(u.uM,false,poseMatrix());
+ gl.uniform1f(u.uFlip,pose.flip?1:0);gl.uniform1f(u.uBlend,pose.blend);gl.uniform1f(u.uBright,pose.bright);gl.uniform1f(u.uWarm,pose.warm);
+ gl.uniform3fv(u.uTint,poseTint());gl.uniform3fv(u.uWrap,[0.22,0.17,0.13]);gl.uniform3fv(u.uEye,eyeOf(cam));gl.uniform1i(u.uTex,0);
  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,pose.tex);
  gl.bindBuffer(gl.ARRAY_BUFFER,poseBuf);gl.vertexAttribPointer(0,3,gl.FLOAT,false,20,0);gl.vertexAttribPointer(1,2,gl.FLOAT,false,20,12);
- gl.drawArrays(gl.TRIANGLES,0,6);
+ gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(true);gl.uniform1f(u.uPass,0);gl.drawArrays(gl.TRIANGLES,0,6);
+ gl.depthMask(false);gl.uniform1f(u.uPass,1);gl.drawArrays(gl.TRIANGLES,0,6);
  gl.bindTexture(gl.TEXTURE_2D,null);gl.disable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(true);}
 function imageHasAlpha(img){const d=img.data;for(let i=3;i<d.length;i+=16)if(d[i]<248)return true;return false;}
 function sampleKey(img){const w=img.width,h=img.height,d=img.data,rad=Math.max(2,Math.round(Math.min(w,h)*0.035));
@@ -1045,11 +1085,41 @@ function sampleKey(img){const w=img.width,h=img.height,d=img.data,rad=Math.max(2
   if(!bk){bk={n:0,r:0,g:0,b:0};bins.set(k,bk);}bk.n++;bk.r+=d[i];bk.g+=d[i+1];bk.b+=d[i+2];}
  let best=null;for(const bk of bins.values())if(!best||bk.n>best.n)best=bk;
  return best&&best.n?[best.r/best.n,best.g/best.n,best.b/best.n]:[255,255,255];}
+function edgeIsPlain(img,key){const w=img.width,h=img.height,d=img.data,rad=Math.max(2,Math.round(Math.min(w,h)*0.03));
+ const spots=[[2,2],[w-rad,2],[2,h-rad],[w-rad,h-rad]];let n=0,acc=0,max=0;
+ for(const [x0,y0] of spots){let r=0,g=0,b=0,c=0;
+  for(let y=y0;y<y0+rad&&y<h;y+=2)for(let x=x0;x<x0+rad&&x<w;x+=2){const i=(y*w+x)*4;r+=d[i];g+=d[i+1];b+=d[i+2];c++;}
+  if(!c)continue;r/=c;g/=c;b/=c;const dist=Math.hypot(r-key[0],g-key[1],b-key[2]);acc+=dist;n++;if(dist>max)max=dist;}
+ return max<46&&(n?acc/n:99)<30;}
+function autoTolerance(img,key){const w=img.width,h=img.height,d=img.data,step=Math.max(1,(Math.max(w,h)/100)|0),edge=[];
+ const distAt=(x,y)=>{const i=(y*w+x)*4;return Math.hypot(d[i]-key[0],d[i+1]-key[1],d[i+2]-key[2]);};
+ for(let x=0;x<w;x+=step){edge.push(distAt(x,0),distAt(x,h-1));}
+ for(let y=step;y<h-1;y+=step){edge.push(distAt(0,y),distAt(w-1,y));}
+ edge.sort((a,b)=>a-b);const p75=edge[Math.min(edge.length-1,(edge.length*0.75)|0)]||28;
+ let csum=0,cn=0;const x0=w*0.32|0,x1=w*0.68|0,y0=h*0.22|0,y1=h*0.62|0;
+ for(let y=y0;y<y1;y+=step*2)for(let x=x0;x<x1;x+=step*2){csum+=distAt(x,y);cn++;}
+ return clamp(Math.min(p75*1.05,(cn?csum/cn:90)*0.62),10,96);}
+function classifyPose(img){if(!img)return 'stand';const w=img.width,h=img.height,d=img.data,step=Math.max(2,(Math.max(w,h)/90)|0);
+ let minX=w,minY=h,maxX=0,maxY=0,n=0;
+ for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){if(d[(y*w+x)*4+3]<36)continue;n++;if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;}
+ if(!n)return 'stand';
+ const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY),contentAspect=bw/bh,srcAspect=w/h,touchesBottom=maxY>h*0.88;
+ if(touchesBottom&&contentAspect<0.48&&bh>h*0.7)return 'stand';
+ if(srcAspect>=0.78||!touchesBottom)return 'portrait';
+ return 'stand';}
+function refreshPoseMode(){if(pose.fitLock||!pose.src)return;pose.mode=classifyPose(pose.removeBg&&poseWork?poseWork:pose.src);}
 function posePixels(){const src=pose.src,w=src.width,h=src.height;if(!poseWork||poseWork.width!==w||poseWork.height!==h)poseWork=new ImageData(w,h);
- const s=src.data,d=poseWork.data,kr=pose.key[0],kg=pose.key[1],kb=pose.key[2],tol=pose.tol,feather=pose.soft?Math.max(8,tol*0.45):0,edge=tol+feather;
- for(let i=0;i<s.length;i+=4){const dr=s[i]-kr,dg=s[i+1]-kg,db=s[i+2]-kb,dist=Math.sqrt(dr*dr+dg*dg+db*db);let a=s[i+3];
-  if(dist<=tol)a=0;else if(feather&&dist<edge)a=(a*(dist-tol)/feather)|0;
-  d[i]=s[i];d[i+1]=s[i+1];d[i+2]=s[i+2];d[i+3]=a;}
+ const s=src.data,d=poseWork.data,kr=pose.key[0],kg=pose.key[1],kb=pose.key[2];
+ const tol=pose.tol,feather=pose.soft?Math.max(16,tol*0.7):Math.max(3,tol*0.08),edge=tol+feather;
+ const smooth01=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+ for(let i=0;i<s.length;i+=4){const dr=s[i]-kr,dg=s[i+1]-kg,db=s[i+2]-kb,dist=Math.sqrt(dr*dr+dg*dg+db*db);
+  let a=s[i+3],spill=0;
+  if(dist<=tol){a=0;spill=1;}else if(dist<edge){const t=(dist-tol)/feather;spill=1-t;a=(a*smooth01(t))|0;}
+  const lum=0.299*s[i]+0.587*s[i+1]+0.114*s[i+2],k=spill*0.82;
+  d[i]=s[i]*(1-k)+lum*k;d[i+1]=s[i+1]*(1-k)+lum*k;d[i+2]=s[i+2]*(1-k)+lum*k;d[i+3]=a;}
+ if(pose.soft){const tmp=new Uint8ClampedArray(w*h);
+  for(let y=0;y<h;y++){const row=y*w;for(let x=0;x<w;x++){const a0=d[((row+Math.max(0,x-1))<<2)+3],a1=d[((row+x)<<2)+3],a2=d[((row+Math.min(w-1,x+1))<<2)+3];tmp[row+x]=(a0+a1*2+a2)>>2;}}
+  for(let i=0;i<tmp.length;i++)d[(i<<2)+3]=tmp[i];}
  return poseWork;}
 function uploadPose(){let source=poseSrcCanvas;
  if(pose.removeBg&&!pose.hasAlpha&&pose.src&&pose.key){const pix=posePixels();poseOutCanvas.width=pix.width;poseOutCanvas.height=pix.height;poseOutCanvas.getContext('2d').putImageData(pix,0,0);source=poseOutCanvas;}
@@ -1060,13 +1130,19 @@ function uploadPose(){let source=poseSrcCanvas;
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
  }finally{gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.bindTexture(gl.TEXTURE_2D,null);}}
-function syncPoseSliders(){const s=$('poseScale'),r=$('poseRot');if(s)s.value=String(Math.round(pose.scale*100)/100);if(r)r.value=String(Math.round(pose.rot*180/Math.PI));$('bPoseFlip').classList.toggle('on',!!pose.flip);}
-function resetPose(){pose.x=POSE_HOME.x;pose.z=POSE_HOME.z;pose.scale=POSE_HOME.scale;pose.rot=POSE_HOME.rot;pose.flip=false;syncPoseSliders();}
+function syncPoseFit(){const stand=$('bPoseStand'),bust=$('bPoseBust'),note=$('poseFitNote');if(!stand)return;
+ stand.classList.toggle('on',pose.mode!=='portrait');bust.classList.toggle('on',pose.mode==='portrait');
+ note.textContent=pose.mode==='portrait'?'Portrait: head and shoulders sit at rider height, with a shadow on the ground.':'Standing: the photo reaches the ground, like a full-length figure.';}
+function syncPoseSliders(){const s=$('poseScale'),r=$('poseRot');if(s)s.value=String(Math.round(pose.scale*100)/100);if(r)r.value=String(Math.round(pose.rot*180/Math.PI));
+ $('bPoseFlip').classList.toggle('on',!!pose.flip);
+ const b=$('poseBlend'),w=$('poseWarm'),br=$('poseBright');if(b)b.value=String(pose.blend);if(w)w.value=String(pose.warm);if(br)br.value=String(pose.bright);syncPoseFit();}
+function resetPose(){pose.x=POSE_HOME.x;pose.z=POSE_HOME.z;pose.scale=POSE_HOME.scale;pose.rot=POSE_HOME.rot;pose.flip=false;pose.fitLock=false;refreshPoseMode();syncPoseSliders();}
 function syncPosePanel(){const on=!!pose.src;$('pose').classList.add('on');$('poseEmpty').hidden=on;$('poseControls').hidden=!on;
  $('poseAlphaNote').hidden=!(on&&pose.hasAlpha);const canKey=on&&!pose.hasAlpha,key=$('poseKey');key.disabled=!canKey;key.checked=canKey&&pose.removeBg;
  $('poseKeyLabel').classList.toggle('off',!canKey);$('poseKeyOpts').hidden=!(canKey&&pose.removeBg);
- $('poseTol').value=String(pose.tol);$('poseSoft').checked=!!pose.soft;$('bPose').classList.toggle('on',on);syncPoseSliders();}
-function removePose(){if(pose.tex){gl.deleteTexture(pose.tex);pose.tex=null;}pose.src=null;pose.key=null;pose.removeBg=false;pose.hasAlpha=false;pose.placed=false;poseWork=null;
+ $('poseAuto').checked=!!pose.autoTol;$('poseTol').value=String(Math.round(pose.tol));$('poseTol').disabled=!!pose.autoTol;
+ $('poseSoft').checked=!!pose.soft;$('bPose').classList.toggle('on',on);syncPoseSliders();}
+function removePose(){if(pose.tex){gl.deleteTexture(pose.tex);pose.tex=null;}pose.src=null;pose.key=null;pose.removeBg=false;pose.hasAlpha=false;pose.placed=false;pose.fitLock=false;pose.mode='stand';poseWork=null;
  canvas.classList.remove('pose');$('poseErr').hidden=true;$('pose').classList.remove('on');$('bPose').classList.remove('on');$('poseControls').hidden=true;$('poseEmpty').hidden=false;}
 function buildPoseImage(img){let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
  if(!w||!h){$('poseErr').textContent='That image is empty.';$('poseErr').hidden=false;return;}
@@ -1074,10 +1150,14 @@ function buildPoseImage(img){let w=img.naturalWidth||img.width,h=img.naturalHeig
  w=Math.max(1,Math.round(w*sc));h=Math.max(1,Math.round(h*sc));
  poseSrcCanvas.width=w;poseSrcCanvas.height=h;const ctx=poseSrcCanvas.getContext('2d',{willReadFrequently:true});
  ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);pose.src=ctx.getImageData(0,0,w,h);pose.aspect=w/h;
- pose.hasAlpha=imageHasAlpha(pose.src);pose.removeBg=false;pose.key=pose.hasAlpha?null:sampleKey(pose.src);poseWork=null;
+ pose.hasAlpha=imageHasAlpha(pose.src);pose.key=pose.hasAlpha?null:sampleKey(pose.src);pose.autoTol=true;pose.soft=true;poseWork=null;
+ pose.removeBg=!pose.hasAlpha&&!!pose.key&&edgeIsPlain(pose.src,pose.key);
+ if(pose.removeBg)pose.tol=autoTolerance(pose.src,pose.key);
  const first=!pose.placed;
  try{uploadPose();}catch(err){$('poseErr').textContent='Could not use that image.';$('poseErr').hidden=false;return;}
- pose.placed=true;if(first)resetPose();else syncPoseSliders();syncPosePanel();}
+ pose.placed=true;if(!pose.fitLock)refreshPoseMode();
+ if(first){pose.x=POSE_HOME.x;pose.z=POSE_HOME.z;pose.scale=POSE_HOME.scale;pose.rot=POSE_HOME.rot;pose.flip=false;}
+ syncPosePanel();}
 function loadPoseFile(file){const err=$('poseErr');err.hidden=true;
  const typeOk=/^image\/(png|jpeg|webp)$/.test(file.type||''),nameOk=/\.(png|jpe?g|webp)$/i.test(file.name||'');
  if(!typeOk&&!nameOk){err.textContent='Choose a PNG, JPG, or WebP image.';err.hidden=false;return;}
@@ -1178,11 +1258,19 @@ if(!TOUR&&!CAPTURE){
  $('poseFile').onchange=()=>{const f=$('poseFile').files&&$('poseFile').files[0];$('poseFile').value='';if(f)loadPoseFile(f);};
  $('poseScale').oninput=()=>{pose.scale=+$('poseScale').value;};
  $('poseRot').oninput=()=>{pose.rot=(+$('poseRot').value)*Math.PI/180;};
+ $('poseBlend').oninput=()=>{pose.blend=+$('poseBlend').value;};
+ $('poseWarm').oninput=()=>{pose.warm=+$('poseWarm').value;};
+ $('poseBright').oninput=()=>{pose.bright=+$('poseBright').value;};
+ $('bPoseStand').onclick=()=>{pose.mode='stand';pose.fitLock=true;syncPoseFit();};
+ $('bPoseBust').onclick=()=>{pose.mode='portrait';pose.fitLock=true;syncPoseFit();};
  $('bPoseFlip').onclick=()=>{pose.flip=!pose.flip;$('bPoseFlip').classList.toggle('on',pose.flip);};
  $('bPoseReset').onclick=resetPose;
  $('bPoseRemove').onclick=removePose;
  $('bPoseSave').onclick=savePose;
- $('poseKey').onchange=()=>{pose.removeBg=$('poseKey').checked&&!pose.hasAlpha;if(pose.removeBg&&pose.src&&!pose.key)pose.key=sampleKey(pose.src);$('poseKeyOpts').hidden=!pose.removeBg;uploadPose();};
+ $('poseKey').onchange=()=>{pose.removeBg=$('poseKey').checked&&!pose.hasAlpha;
+  if(pose.removeBg){if(pose.src&&!pose.key)pose.key=sampleKey(pose.src);if(pose.autoTol&&pose.key)pose.tol=autoTolerance(pose.src,pose.key);}
+  uploadPose();refreshPoseMode();syncPosePanel();};
+ $('poseAuto').onchange=()=>{pose.autoTol=$('poseAuto').checked;if(pose.autoTol&&pose.src&&pose.key)pose.tol=autoTolerance(pose.src,pose.key);$('poseTol').disabled=!!pose.autoTol;$('poseTol').value=String(Math.round(pose.tol));if(pose.removeBg)uploadPose();};
  $('poseTol').oninput=()=>{pose.tol=+$('poseTol').value;if(pose.removeBg)uploadPose();};
  $('poseSoft').onchange=()=>{pose.soft=$('poseSoft').checked;if(pose.removeBg)uploadPose();};
 }
