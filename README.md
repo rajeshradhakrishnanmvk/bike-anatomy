@@ -39,6 +39,8 @@ A study page shows the silent tour, the NotebookLM mind map and infographic (cli
 
 The study page also links to `?tour=1`, which plays the auto-tour inside the viewer. The viewers are stored unchanged; the gallery does not rewrite them.
 
+On the Model C viewer, **Add yourself** places a PNG, JPG, or WebP in the frame beside the motorcycle. Drag moves it on the ground, the wheel or a slider scales it, and Save photo downloads the view as a PNG. The picture is processed only in the browser and is never uploaded or stored. That control is hidden for `?tour=1` and `&capture=1`, so the tour films stay as they are.
+
 ## Add a motorcycle
 
 1. Pick a slug of lowercase letters, digits, and hyphens, for example `wla`.

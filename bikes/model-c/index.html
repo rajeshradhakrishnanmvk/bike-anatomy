@@ -11,7 +11,7 @@ html,body{margin:0;height:100%;background:#0b0a08;color:var(--ink);font-family:s
 #stage{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;background:#12100d}
 #stage.fixed{left:50%;top:50%;transform:translate(-50%,-50%)}
 canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
-canvas.drag{cursor:grabbing} canvas.hot{cursor:pointer}
+canvas.pose{cursor:move} canvas.drag{cursor:grabbing} canvas.hot{cursor:pointer}
 #vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 45%,rgba(0,0,0,.62) 100%)}
 #titleBlock{position:absolute;left:calc(var(--u)*28);top:calc(var(--u)*22);max-width:calc(var(--u)*640);pointer-events:none}
 #titleBlock .k{font-size:calc(var(--u)*11);letter-spacing:.28em;color:var(--brass);text-transform:uppercase}
@@ -96,6 +96,23 @@ body.tour #credit{right:calc(var(--u)*44);bottom:calc(var(--u)*20);font-size:cal
 #bConf.on{background:rgba(232,140,60,.25)}
 body.tour #panel .yr{font-size:calc(var(--u)*15)}
 #toolbar{max-width:49%}
+#pose{display:none;position:absolute;left:calc(var(--u)*20);top:calc(var(--u)*132);width:calc(var(--u)*292);max-height:calc(100% - var(--u)*220);overflow:auto;background:var(--panel);border:1px solid rgba(216,180,106,.28);border-radius:calc(var(--u)*12);padding:calc(var(--u)*14) calc(var(--u)*14) calc(var(--u)*12);z-index:4;box-shadow:0 calc(var(--u)*10) calc(var(--u)*40) rgba(0,0,0,.45)}
+#pose.on{display:block}
+#pose h3{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:calc(var(--u)*18);margin:0 calc(var(--u)*32) calc(var(--u)*6) 0;line-height:1.2;pointer-events:none}
+#pose .x{position:absolute;right:calc(var(--u)*6);top:calc(var(--u)*4);background:none;border:none;font-size:calc(var(--u)*18);color:var(--mute);padding:calc(var(--u)*4);z-index:2}
+#pose p{margin:0 0 calc(var(--u)*8);font-size:calc(var(--u)*12);line-height:1.4;color:var(--mute)}
+#pose .pose-note{color:#8d826d;font-size:calc(var(--u)*11);margin:calc(var(--u)*8) 0 0}
+#pose .pose-err{color:#e58a7f}
+#pose label{display:flex;align-items:center;gap:calc(var(--u)*8);margin:calc(var(--u)*5) 0;font-size:calc(var(--u)*12);color:var(--mute)}
+#pose label span{min-width:calc(var(--u)*76)}
+#pose label input[type=range]{flex:1;min-width:0;accent-color:#d8b46a}
+#pose label.check{gap:calc(var(--u)*8)}
+#pose label.off{opacity:.5}
+#pose .row{display:flex;flex-wrap:wrap;gap:calc(var(--u)*6);margin-top:calc(var(--u)*6)}
+#pose .row button{flex:1}
+#poseFile{position:fixed;left:-40px;top:0;width:1px;height:1px;opacity:0}
+body.capture #bPose,body.capture #pose,body.capture #poseFile{display:none!important}
+@media (max-width:760px){#pose{left:8px;right:8px;width:auto;top:104px;max-height:40vh}}
 </style>
 </head>
 <body>
@@ -116,22 +133,54 @@ body.tour #panel .yr{font-size:calc(var(--u)*15)}
     <button id="bFinish">Paint</button>
     <button id="bConf">⚠ Source conflicts</button>
     <button id="bReset">Reset view</button>
+    <button id="bPose" type="button">Add yourself</button>
     <button id="bTour">▶ Tour</button>
   </div>
   <aside id="partsDrawer" class="chrome"></aside>
   <aside id="panel"></aside>
   <div id="variants" class="chrome"></div>
-  <div id="hint" class="chrome">Drag to orbit · scroll or pinch to zoom · click a part · E explode · Y year · P paint · C conflicts · T tour</div>
+  <div id="hint" class="chrome">Drag to orbit · scroll or pinch to zoom · click a part · Add yourself to pose · E explode · Y year · P paint · C conflicts · T tour</div>
   <div id="tooltip" class="chrome"></div>
   <div id="caption"><div class="bar"></div><div class="k"></div><div class="t"></div><div class="s"></div></div>
   <div id="card"><div class="in"><div class="k"></div><h1></h1><div class="s"></div><div class="rule"></div><div class="c">Data: NotebookLM Studio report, Bike Anatomy notebook</div></div></div>
   <div id="credit">Data: NotebookLM Studio report, Bike Anatomy notebook</div>
+  <aside id="pose" class="chrome" aria-label="Pose with the bike">
+    <button class="x" id="poseClose" type="button" aria-label="Close">×</button>
+    <h3>Pose with the bike</h3>
+    <p id="poseEmpty">Choose a PNG, JPG, or WebP. It stands in the frame beside the motorcycle.</p>
+    <div id="poseControls" hidden>
+      <p class="pose-help">Drag the cutout to move it. Scroll or pinch on it to scale. Drag empty space to orbit the bike.</p>
+      <label><span>Scale</span> <input id="poseScale" type="range" min="0.35" max="2.4" step="0.01" value="1" aria-label="Scale"></label>
+      <label><span>Rotate</span> <input id="poseRot" type="range" min="-180" max="180" step="1" value="28" aria-label="Rotate"></label>
+      <div class="row">
+        <button id="bPoseFlip" type="button">Flip</button>
+        <button id="bPoseReset" type="button">Reset pose</button>
+      </div>
+      <label class="check" id="poseKeyLabel"><input id="poseKey" type="checkbox"> Remove plain background</label>
+      <div id="poseKeyOpts" hidden>
+        <label><span>Tolerance</span> <input id="poseTol" type="range" min="0" max="140" step="1" value="48" aria-label="Background tolerance"></label>
+        <label class="check"><input id="poseSoft" type="checkbox" checked> Soft edge</label>
+      </div>
+      <p class="pose-note" id="poseAlphaNote" hidden>Transparent image, used as-is.</p>
+      <div class="row">
+        <button id="bPoseReplace" type="button">Replace photo</button>
+        <button id="bPoseRemove" type="button">Remove photo</button>
+      </div>
+      <div class="row">
+        <button id="bPoseSave" type="button">Save photo</button>
+      </div>
+    </div>
+    <p class="pose-note">Your photo is processed only in this browser. It is never uploaded or stored.</p>
+    <p class="pose-err" id="poseErr" hidden></p>
+  </aside>
+  <input id="poseFile" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" tabindex="-1" aria-hidden="true">
   <div id="err">WebGL is not available in this browser.</div>
 </div>
 <script>
 'use strict';
 /* Harley-Davidson Model C (30.50 cu in side-valve single, 1929–1934) anatomy viewer. Bike Anatomy, episode 3.
    Pure HTML5 + vanilla JS + raw WebGL1, no dependencies, no external URLs.
+   Add yourself poses a photo on an upright cutout. FileReader and canvas only — the picture is never uploaded.
    All part and spec text comes from the NotebookLM Studio report
    "Technical Anatomy and Architectural Guide to the Harley-Davidson Model C (1929–1934)".
    Shapes follow period reference photos (1930 30C, 1931 C); proportions are illustrative.
@@ -388,7 +437,8 @@ const M4={
  lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);const m=new Float32Array(16);
   m[0]=x[0];m[4]=x[1];m[8]=x[2];m[1]=y[0];m[5]=y[1];m[9]=y[2];m[2]=z[0];m[6]=z[1];m[10]=z[2];
   m[12]=-dot(x,e);m[13]=-dot(y,e);m[14]=-dot(z,e);m[15]=1;return m;},
- cols(x,y,z,o){const m=new Float32Array(16);m[0]=x[0];m[1]=x[1];m[2]=x[2];m[4]=y[0];m[5]=y[1];m[6]=y[2];m[8]=z[0];m[9]=z[1];m[10]=z[2];m[12]=o[0];m[13]=o[1];m[14]=o[2];m[15]=1;return m;}
+ cols(x,y,z,o){const m=new Float32Array(16);m[0]=x[0];m[1]=x[1];m[2]=x[2];m[4]=y[0];m[5]=y[1];m[6]=y[2];m[8]=z[0];m[9]=z[1];m[10]=z[2];m[12]=o[0];m[13]=o[1];m[14]=o[2];m[15]=1;return m;},
+ rotY(a){const c=Math.cos(a),s=Math.sin(a),m=M4.id();m[0]=c;m[2]=-s;m[8]=s;m[10]=c;return m;}
 };
 /* frame whose local Y = axis and local X follows the hint */
 function basisY(o,axis,hint){const y=norm(axis);let h=hint||(Math.abs(y[1])<0.95?[0,1,0]:[1,0,0]);
@@ -926,6 +976,126 @@ const LIGHT=[0.45,0.85,0.55];
 const SHM=(()=>{const m=M4.id();m[4]=-LIGHT[0]/LIGHT[1];m[5]=0;m[6]=-LIGHT[2]/LIGHT[1];m[13]=0.0015;return m;})(); // planar projection onto y=0
 function drawModel(p,dr){const e=p.e;return M4.trans(dr.ex[0]*e,dr.ex[1]*e,dr.ex[2]*e);}
 function bindBuf(dr,all){gl.bindBuffer(gl.ARRAY_BUFFER,dr.buf);gl.vertexAttribPointer(0,3,gl.FLOAT,false,40,0);if(all){gl.vertexAttribPointer(1,3,gl.FLOAT,false,40,12);gl.vertexAttribPointer(2,4,gl.FLOAT,false,40,24);}}
+
+/* ---- pose cutout: a photo on an upright quad. Pixels never leave the browser. ---- */
+function progUV(vs,fs){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,vs));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));
+ gl.bindAttribLocation(p,0,'aP');gl.bindAttribLocation(p,1,'aUV');gl.linkProgram(p);
+ if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);
+ for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}return {p,u};}
+const VS_CUT=`attribute vec3 aP;attribute vec2 aUV;uniform mat4 uVP;uniform mat4 uM;varying vec2 vUV;
+void main(){vUV=aUV;gl_Position=uVP*(uM*vec4(aP,1.0));}`;
+const FS_CUT=`precision mediump float;uniform sampler2D uTex;uniform float uFlip;varying vec2 vUV;
+void main(){vec2 uv=vec2(uFlip>0.5?1.0-vUV.x:vUV.x,vUV.y);vec4 c=texture2D(uTex,uv);if(c.a<0.02)discard;gl_FragColor=c;}`;
+const FS_BLOB=`precision mediump float;varying vec2 vUV;uniform float uA;
+void main(){float d=length(vUV);float a=smoothstep(1.0,0.28,d)*uA;if(a<0.012)discard;gl_FragColor=vec4(0.02,0.015,0.01,a);}`;
+const P_CUT=progUV(VS_CUT,FS_CUT),P_BLOB=progUV(VS_CUT,FS_BLOB);
+const poseBuf=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,poseBuf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
+ -0.5,0,0, 0,0,  0.5,0,0, 1,0,  0.5,1,0, 1,1,
+ -0.5,0,0, 0,0,  0.5,1,0, 1,1, -0.5,1,0, 0,1
+]),gl.STATIC_DRAW);
+const poseBlob=gl.createBuffer();let poseBlobN=0;
+{const n=28,v=[];for(let i=0;i<n;i++){const a0=i/n*TAU,a1=(i+1)/n*TAU;
+ v.push(0,0.004,0,0,0, Math.cos(a0),0.004,Math.sin(a0),Math.cos(a0),Math.sin(a0), Math.cos(a1),0.004,Math.sin(a1),Math.cos(a1),Math.sin(a1));}
+ poseBlobN=v.length/5;gl.bindBuffer(gl.ARRAY_BUFFER,poseBlob);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);}
+const POSE_HOME={x:0.22,z:0.55,scale:0.82,rot:28*Math.PI/180};
+const pose={x:POSE_HOME.x,z:POSE_HOME.z,scale:1,rot:POSE_HOME.rot,flip:false,tex:null,src:null,aspect:0.5,hasAlpha:false,removeBg:false,tol:48,soft:true,key:null,placed:false};
+let poseWork=null,poseDrag=false,poseGrab=null,posePinch=false,posePinch0=0,poseScale0=1;
+const poseSrcCanvas=document.createElement('canvas'),poseOutCanvas=document.createElement('canvas');
+function poseSize(){const h=1.72*pose.scale,w=h*(pose.aspect>0?pose.aspect:0.5);return {h,w};}
+function poseMatrix(){const s=poseSize();return M4.mul(M4.trans(pose.x,0,pose.z),M4.mul(M4.rotY(pose.rot),M4.scale(s.w,s.h,1)));}
+function poseShadowMatrix(){const s=poseSize(),rad=Math.max(0.16,s.w*0.34);return M4.mul(M4.trans(pose.x,0,pose.z),M4.scale(rad,1,rad*0.72));}
+function poseMetrics(){const s=poseSize(),c=Math.cos(pose.rot),sn=Math.sin(pose.rot);return {h:s.h,w:s.w,right:[c,0,-sn],normal:[sn,0,c]};}
+function screenRay(px,py){const asp=canvas.width/canvas.height,fy=asp<1.5?2*Math.atan(Math.tan(17*Math.PI/180)*1.5/asp):34*Math.PI/180;
+ const eye=eyeOf(cam),backward=norm(sub(eye,cam.t)),right=norm(cross([0,1,0],backward)),yup=cross(backward,right);
+ const rw=canvas.clientWidth||W,rh=canvas.clientHeight||H,ndcX=(px/rw)*2-1-lensShift,ndcY=1-(py/rh)*2;
+ const tanY=Math.tan(fy/2),tanX=tanY*asp;
+ return {o:eye,d:norm(add(add(scl(right,ndcX*tanX),scl(yup,ndcY*tanY)),norm(sub(cam.t,eye))))};}
+function poseAlphaAt(lx,ly){const src=(pose.removeBg&&poseWork)?poseWork:pose.src;if(!src)return 255;
+ let u=lx+0.5;if(pose.flip)u=1-u;
+ const x=clamp(u*src.width|0,0,src.width-1),y=clamp((1-ly)*src.height|0,0,src.height-1);
+ return src.data[(y*src.width+x)*4+3];}
+function poseHit(px,py){if(!pose.tex)return null;const ray=screenRay(px,py),m=poseMetrics(),denom=dot(m.normal,ray.d);
+ if(Math.abs(denom)<1e-6)return null;const p0=[pose.x,0,pose.z],t=dot(m.normal,sub(p0,ray.o))/denom;if(t<0)return null;
+ const hit=add(ray.o,scl(ray.d,t)),rel=sub(hit,p0),lx=dot(rel,m.right)/m.w,ly=hit[1]/m.h;
+ if(lx<-0.5||lx>0.5||ly<0||ly>1)return null;if(poseAlphaAt(lx,ly)<24)return null;
+ return {lx,ly,y:hit[1],wx:hit[0],wz:hit[2]};}
+function movePose(px,py){if(!poseGrab)return;const ray=screenRay(px,py);if(Math.abs(ray.d[1])<1e-6)return;
+ const t=(poseGrab.y-ray.o[1])/ray.d[1];if(t<0)return;
+ pose.x=clamp(ray.o[0]+ray.d[0]*t+poseGrab.ox,-3.4,3.4);pose.z=clamp(ray.o[2]+ray.d[2]*t+poseGrab.oz,-3.4,3.4);}
+function drawPose(vp){if(!pose.tex||TOUR||CAPTURE)return;
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
+ gl.useProgram(P_BLOB.p);gl.uniformMatrix4fv(P_BLOB.u.uVP,false,vp);gl.uniformMatrix4fv(P_BLOB.u.uM,false,poseShadowMatrix());gl.uniform1f(P_BLOB.u.uA,0.5);
+ gl.bindBuffer(gl.ARRAY_BUFFER,poseBlob);gl.vertexAttribPointer(0,3,gl.FLOAT,false,20,0);gl.enableVertexAttribArray(0);
+ gl.vertexAttribPointer(1,2,gl.FLOAT,false,20,12);gl.enableVertexAttribArray(1);gl.disableVertexAttribArray(2);gl.drawArrays(gl.TRIANGLES,0,poseBlobN);
+ gl.depthMask(true);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+ gl.useProgram(P_CUT.p);gl.uniformMatrix4fv(P_CUT.u.uVP,false,vp);gl.uniformMatrix4fv(P_CUT.u.uM,false,poseMatrix());
+ gl.uniform1f(P_CUT.u.uFlip,pose.flip?1:0);gl.uniform1i(P_CUT.u.uTex,0);
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,pose.tex);
+ gl.bindBuffer(gl.ARRAY_BUFFER,poseBuf);gl.vertexAttribPointer(0,3,gl.FLOAT,false,20,0);gl.vertexAttribPointer(1,2,gl.FLOAT,false,20,12);
+ gl.drawArrays(gl.TRIANGLES,0,6);
+ gl.bindTexture(gl.TEXTURE_2D,null);gl.disable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(true);}
+function imageHasAlpha(img){const d=img.data;for(let i=3;i<d.length;i+=16)if(d[i]<248)return true;return false;}
+function sampleKey(img){const w=img.width,h=img.height,d=img.data,rad=Math.max(2,Math.round(Math.min(w,h)*0.035));
+ const spots=[[0,0],[w-rad,0],[0,h-rad],[w-rad,h-rad],[(w-rad)>>1,0],[0,(h-rad)>>1],[w-rad,(h-rad)>>1],[(w-rad)>>1,h-rad]];
+ const bins=new Map();
+ for(const [x0,y0] of spots)for(let y=y0;y<y0+rad;y+=2)for(let x=x0;x<x0+rad;x+=2){if(x<0||y<0||x>=w||y>=h)continue;
+  const i=(y*w+x)*4,k=((d[i]>>4)<<8)|((d[i+1]>>4)<<4)|(d[i+2]>>4);let bk=bins.get(k);
+  if(!bk){bk={n:0,r:0,g:0,b:0};bins.set(k,bk);}bk.n++;bk.r+=d[i];bk.g+=d[i+1];bk.b+=d[i+2];}
+ let best=null;for(const bk of bins.values())if(!best||bk.n>best.n)best=bk;
+ return best&&best.n?[best.r/best.n,best.g/best.n,best.b/best.n]:[255,255,255];}
+function posePixels(){const src=pose.src,w=src.width,h=src.height;if(!poseWork||poseWork.width!==w||poseWork.height!==h)poseWork=new ImageData(w,h);
+ const s=src.data,d=poseWork.data,kr=pose.key[0],kg=pose.key[1],kb=pose.key[2],tol=pose.tol,feather=pose.soft?Math.max(8,tol*0.45):0,edge=tol+feather;
+ for(let i=0;i<s.length;i+=4){const dr=s[i]-kr,dg=s[i+1]-kg,db=s[i+2]-kb,dist=Math.sqrt(dr*dr+dg*dg+db*db);let a=s[i+3];
+  if(dist<=tol)a=0;else if(feather&&dist<edge)a=(a*(dist-tol)/feather)|0;
+  d[i]=s[i];d[i+1]=s[i+1];d[i+2]=s[i+2];d[i+3]=a;}
+ return poseWork;}
+function uploadPose(){let source=poseSrcCanvas;
+ if(pose.removeBg&&!pose.hasAlpha&&pose.src&&pose.key){const pix=posePixels();poseOutCanvas.width=pix.width;poseOutCanvas.height=pix.height;poseOutCanvas.getContext('2d').putImageData(pix,0,0);source=poseOutCanvas;}
+ if(!pose.tex)pose.tex=gl.createTexture();
+ gl.bindTexture(gl.TEXTURE_2D,pose.tex);
+ gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
+ try{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,source);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+ }finally{gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.bindTexture(gl.TEXTURE_2D,null);}}
+function syncPoseSliders(){const s=$('poseScale'),r=$('poseRot');if(s)s.value=String(Math.round(pose.scale*100)/100);if(r)r.value=String(Math.round(pose.rot*180/Math.PI));$('bPoseFlip').classList.toggle('on',!!pose.flip);}
+function resetPose(){pose.x=POSE_HOME.x;pose.z=POSE_HOME.z;pose.scale=POSE_HOME.scale;pose.rot=POSE_HOME.rot;pose.flip=false;syncPoseSliders();}
+function syncPosePanel(){const on=!!pose.src;$('pose').classList.add('on');$('poseEmpty').hidden=on;$('poseControls').hidden=!on;
+ $('poseAlphaNote').hidden=!(on&&pose.hasAlpha);const canKey=on&&!pose.hasAlpha,key=$('poseKey');key.disabled=!canKey;key.checked=canKey&&pose.removeBg;
+ $('poseKeyLabel').classList.toggle('off',!canKey);$('poseKeyOpts').hidden=!(canKey&&pose.removeBg);
+ $('poseTol').value=String(pose.tol);$('poseSoft').checked=!!pose.soft;$('bPose').classList.toggle('on',on);syncPoseSliders();}
+function removePose(){if(pose.tex){gl.deleteTexture(pose.tex);pose.tex=null;}pose.src=null;pose.key=null;pose.removeBg=false;pose.hasAlpha=false;pose.placed=false;poseWork=null;
+ canvas.classList.remove('pose');$('poseErr').hidden=true;$('pose').classList.remove('on');$('bPose').classList.remove('on');$('poseControls').hidden=true;$('poseEmpty').hidden=false;}
+function buildPoseImage(img){let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+ if(!w||!h){$('poseErr').textContent='That image is empty.';$('poseErr').hidden=false;return;}
+ const maxDim=Math.min(1024,gl.getParameter(gl.MAX_TEXTURE_SIZE)||1024),sc=Math.min(1,maxDim/Math.max(w,h));
+ w=Math.max(1,Math.round(w*sc));h=Math.max(1,Math.round(h*sc));
+ poseSrcCanvas.width=w;poseSrcCanvas.height=h;const ctx=poseSrcCanvas.getContext('2d',{willReadFrequently:true});
+ ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);pose.src=ctx.getImageData(0,0,w,h);pose.aspect=w/h;
+ pose.hasAlpha=imageHasAlpha(pose.src);pose.removeBg=false;pose.key=pose.hasAlpha?null:sampleKey(pose.src);poseWork=null;
+ const first=!pose.placed;
+ try{uploadPose();}catch(err){$('poseErr').textContent='Could not use that image.';$('poseErr').hidden=false;return;}
+ pose.placed=true;if(first)resetPose();else syncPoseSliders();syncPosePanel();}
+function loadPoseFile(file){const err=$('poseErr');err.hidden=true;
+ const typeOk=/^image\/(png|jpeg|webp)$/.test(file.type||''),nameOk=/\.(png|jpe?g|webp)$/i.test(file.name||'');
+ if(!typeOk&&!nameOk){err.textContent='Choose a PNG, JPG, or WebP image.';err.hidden=false;return;}
+ const reader=new FileReader();
+ reader.onerror=()=>{err.textContent='Could not read that file.';err.hidden=false;};
+ reader.onload=()=>{const im=new Image();im.onload=()=>buildPoseImage(im);im.onerror=()=>{err.textContent='Could not read that image.';err.hidden=false;};im.src=reader.result;};
+ reader.readAsDataURL(file);}
+function savePose(){if(!pose.tex||TOUR||CAPTURE)return;render();
+ const w=canvas.width,h=canvas.height,pix=new Uint8Array(w*h*4);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pix);
+ const out=document.createElement('canvas');out.width=w;out.height=h;const ctx=out.getContext('2d'),im=ctx.createImageData(w,h),row=w*4;
+ for(let y=0;y<h;y++)im.data.set(pix.subarray((h-1-y)*row,(h-y)*row),y*row);ctx.putImageData(im,0,0);
+ const fs=Math.max(13,Math.round(h*0.022)),pad=Math.round(fs*0.9),barW=Math.round(fs*2.6),barH=Math.max(2,Math.round(fs*0.14));
+ ctx.save();ctx.shadowColor='rgba(0,0,0,.7)';ctx.shadowBlur=fs*0.5;ctx.fillStyle='rgba(216,180,106,.92)';
+ ctx.fillRect(pad,h-pad-fs-Math.round(fs*0.45),barW,barH);
+ ctx.font=fs+'px Georgia,"Times New Roman",serif';ctx.textBaseline='bottom';ctx.textAlign='left';ctx.fillText('Model C  ·  '+year,pad,h-pad);ctx.restore();
+ out.toBlob(blob=>{if(!blob)return;const a=document.createElement('a'),url=URL.createObjectURL(blob);
+  a.href=url;a.download='model-c-'+year+'-pose.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);},'image/png');}
 let timeSec=0;const BG=[0.07,0.064,0.056];
 function render(){const {vp,eye}=viewProj();
  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,canvas.width,canvas.height);
@@ -942,6 +1112,7 @@ function render(){const {vp,eye}=viewProj();
  gl.enableVertexAttribArray(1);gl.enableVertexAttribArray(2);
  for(const p of PARTS){gl.uniform1f(u.uSel,p.selA);gl.uniform1f(u.uHover,p===hovered&&!TOUR?1:0);gl.uniform1f(u.uDim,p.dimA);
   for(const dr of p.draws){if(!dr.count)continue;gl.uniformMatrix4fv(u.uM,false,drawModel(p,dr));bindBuf(dr,true);gl.drawArrays(gl.TRIANGLES,0,dr.count);}}
+ drawPose(vp);
  gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);}
 function pickAt(cx,cy){const w=canvas.width,h=canvas.height;ensurePick(w,h);const {vp}=viewProj();
  gl.bindFramebuffer(gl.FRAMEBUFFER,pickFB);gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);
@@ -1000,25 +1171,53 @@ $('bConf').onclick=openConflicts;
 $('bReset').onclick=()=>{select(null);setExplode(false);Object.assign(goal,{yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()});};
 $('bParts').onclick=()=>{$('partsDrawer').classList.toggle('open');$('bParts').classList.toggle('on');};
 $('bTour').onclick=()=>{const q=new URLSearchParams(location.search);q.set('tour','1');location.search=q.toString();};
+if(!TOUR&&!CAPTURE){
+ $('bPose').onclick=()=>{$('poseErr').hidden=true;if(pose.src){$('pose').classList.toggle('on');return;}$('pose').classList.add('on');$('poseEmpty').hidden=false;$('poseControls').hidden=true;$('poseFile').click();};
+ $('poseClose').onclick=()=>$('pose').classList.remove('on');
+ $('bPoseReplace').onclick=()=>$('poseFile').click();
+ $('poseFile').onchange=()=>{const f=$('poseFile').files&&$('poseFile').files[0];$('poseFile').value='';if(f)loadPoseFile(f);};
+ $('poseScale').oninput=()=>{pose.scale=+$('poseScale').value;};
+ $('poseRot').oninput=()=>{pose.rot=(+$('poseRot').value)*Math.PI/180;};
+ $('bPoseFlip').onclick=()=>{pose.flip=!pose.flip;$('bPoseFlip').classList.toggle('on',pose.flip);};
+ $('bPoseReset').onclick=resetPose;
+ $('bPoseRemove').onclick=removePose;
+ $('bPoseSave').onclick=savePose;
+ $('poseKey').onchange=()=>{pose.removeBg=$('poseKey').checked&&!pose.hasAlpha;if(pose.removeBg&&pose.src&&!pose.key)pose.key=sampleKey(pose.src);$('poseKeyOpts').hidden=!pose.removeBg;uploadPose();};
+ $('poseTol').oninput=()=>{pose.tol=+$('poseTol').value;if(pose.removeBg)uploadPose();};
+ $('poseSoft').onchange=()=>{pose.soft=$('poseSoft').checked;if(pose.removeBg)uploadPose();};
+}
 if(explodeTarget)$('bExplode').classList.add('on');
 setYear(year);
 
 /* --------------------------- interaction ---------------------------- */
 const ptrs=new Map();let moved=0,pinch0=0,dist0=0,hoverReq=null,lastHover=0;
-canvas.addEventListener('pointerdown',e=>{if(TOUR)return;canvas.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===1)moved=0;
- if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);dist0=goal.dist;moved=99;}canvas.classList.add('drag');lastInput=performance.now();});
+canvas.addEventListener('pointerdown',e=>{if(TOUR)return;canvas.setPointerCapture(e.pointerId);const r=canvas.getBoundingClientRect();ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(ptrs.size===1){moved=0;poseDrag=false;posePinch=false;if(pose.tex){const hit=poseHit(e.clientX-r.left,e.clientY-r.top);if(hit){poseDrag=true;poseGrab={y:hit.y,ox:pose.x-hit.wx,oz:pose.z-hit.wz};}}}
+ if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);moved=99;
+  if(poseDrag&&pose.tex){posePinch=true;posePinch0=pinch0||1;poseScale0=pose.scale;}else{posePinch=false;dist0=goal.dist;}}
+ canvas.classList.add('drag');lastInput=performance.now();});
 canvas.addEventListener('pointermove',e=>{if(TOUR)return;const r=canvas.getBoundingClientRect();
  if(ptrs.has(e.pointerId)){const p=ptrs.get(e.pointerId);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
-  if(ptrs.size===1){goal.yaw-=dx*0.008;goal.pitch=clamp(goal.pitch+dy*0.006,0.02,1.3);}
+  if(poseDrag&&posePinch&&ptrs.size>=2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(posePinch0>0&&d>0){pose.scale=clamp(poseScale0*d/posePinch0,0.35,2.4);syncPoseSliders();}}
+  else if(poseDrag&&ptrs.size===1)movePose(e.clientX-r.left,e.clientY-r.top);
+  else if(ptrs.size===1){goal.yaw-=dx*0.008;goal.pitch=clamp(goal.pitch+dy*0.006,0.02,1.3);}
   else if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0>0&&d>0)goal.dist=clamp(dist0*pinch0/d,0.8,7);}
   lastInput=performance.now();}
- else hoverReq={x:e.clientX-r.left,y:e.clientY-r.top};});
+ else{const x=e.clientX-r.left,y=e.clientY-r.top;
+  if(pose.tex&&poseHit(x,y)){canvas.classList.add('pose');canvas.classList.remove('hot');hovered=null;$('tooltip').style.opacity=0;hoverReq=null;}
+  else{canvas.classList.remove('pose');hoverReq={x,y};}}});
 function endPtr(e){if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);
- if(ptrs.size===0){canvas.classList.remove('drag');if(moved<6){const r=canvas.getBoundingClientRect();const p=pickAt(e.clientX-r.left,e.clientY-r.top);select(p&&p===selected?null:p);}}}
+ if(ptrs.size===1&&posePinch){posePinch=false;const left=[...ptrs.values()][0],r=canvas.getBoundingClientRect(),ray=screenRay(left.x-r.left,left.y-r.top);
+  if(poseGrab&&Math.abs(ray.d[1])>1e-6){const t=(poseGrab.y-ray.o[1])/ray.d[1];if(t>0){const x=ray.o[0]+ray.d[0]*t,z=ray.o[2]+ray.d[2]*t;poseGrab={y:poseGrab.y,ox:pose.x-x,oz:pose.z-z};}}}
+ if(ptrs.size===0){canvas.classList.remove('drag');const was=poseDrag;poseDrag=false;posePinch=false;poseGrab=null;
+  if(!was&&moved<6){const r=canvas.getBoundingClientRect();const p=pickAt(e.clientX-r.left,e.clientY-r.top);select(p&&p===selected?null:p);}}}
 canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
-canvas.addEventListener('wheel',e=>{if(TOUR)return;e.preventDefault();goal.dist=clamp(goal.dist*Math.exp(e.deltaY*0.0012),0.8,7);lastInput=performance.now();},{passive:false});
-canvas.addEventListener('pointerleave',()=>{hovered=null;$('tooltip').style.opacity=0;canvas.classList.remove('hot');});
-window.addEventListener('keydown',e=>{if(TOUR)return;const k=e.key.toLowerCase();if(k==='e')setExplode(!explodeTarget);else if(k==='escape')select(null);else if(k==='t')$('bTour').click();else if(k==='r')$('bReset').click();
+canvas.addEventListener('wheel',e=>{if(TOUR)return;e.preventDefault();const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+ if(pose.tex&&poseHit(x,y)){pose.scale=clamp(pose.scale*Math.exp(-e.deltaY*0.0011),0.35,2.4);syncPoseSliders();}
+ else goal.dist=clamp(goal.dist*Math.exp(e.deltaY*0.0012),0.8,7);lastInput=performance.now();},{passive:false});
+canvas.addEventListener('pointerleave',()=>{hovered=null;$('tooltip').style.opacity=0;canvas.classList.remove('hot');canvas.classList.remove('pose');});
+window.addEventListener('keydown',e=>{if(TOUR)return;const tag=e.target&&e.target.tagName;if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+ const k=e.key.toLowerCase();if(k==='e')setExplode(!explodeTarget);else if(k==='escape')select(null);else if(k==='t')$('bTour').click();else if(k==='r')$('bReset').click();
  else if(k==='y')$('bYear').click();else if(k==='p')$('bFinish').click();else if(k==='c')openConflicts();});
 
 /* ------------------------------- tour --------------------------------

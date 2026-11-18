@@ -42,7 +42,7 @@ window.BIKES = [
     years: "1929–1934",
     year: 1929,
     spec: "30.50 cu in Flathead single",
-    blurb: "Olive-green 500-class side-valve single with a Ricardo head, built for solo use only. Twin headlamps and a barrel toolbox in 1930, a single lamp after that.",
+    blurb: "Olive-green 500-class side-valve single with a Ricardo head, built for solo use only. Twin headlamps and a barrel toolbox in 1930, a single lamp after that. In the viewer, Add yourself poses a photo with the bike; the picture stays in the browser.",
     posterAlt: "Olive-green Harley-Davidson Model C single with twin bullet headlamps, a barrel toolbox across the fork and an upright finned cylinder, posed on a dark studio floor.",
     mindmapAlt: "NotebookLM mind map of the Model C, branching into overview, engine and drivetrain, chassis and equipment, model variants, related models, and restoration.",
     infoAlt: "NotebookLM infographic of the 1929 to 1934 Model C, covering the 30.50 cubic inch flathead, 4,472 units produced, the shared Model D chassis, and comparisons with the Peashooter, the strap tank myth, and the Model A and B singles."
