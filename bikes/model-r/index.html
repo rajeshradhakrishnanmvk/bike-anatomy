@@ -328,7 +328,8 @@ const PAINTS=[
  {id:'silver',name:'Silver & orange',years:'1934 photo',year:1934,body:[0.66,0.67,0.68],frame:[0.035,0.034,0.032],tone:[0.86,0.36,0.08]},
  {id:'gable',name:'Red (Clark Gable’s 1934 RL45)',years:'report §11: a red 1934 RL45',year:0,body:[0.62,0.07,0.05],frame:[0.035,0.034,0.032],tone:[0.86,0.66,0.30]},
  {id:'red',name:'Red & black',years:'1935 photo',year:1935,body:[0.72,0.12,0.05],frame:[0.035,0.034,0.032],tone:[0.035,0.034,0.032]},
- {id:'gold',name:'Gold & black',years:'1936 photo',year:1936,body:[0.55,0.43,0.17],frame:[0.035,0.034,0.032],tone:[0.035,0.034,0.032]}
+ {id:'gold',name:'Gold & black',years:'1936 photo',year:1936,body:[0.55,0.43,0.17],frame:[0.035,0.034,0.032],tone:[0.035,0.034,0.032]},
+ {id:'green36',name:'Olive green & cream',years:'1936 alternative: Helsinki RL45 photo',year:0,body:[0.25,0.31,0.17],frame:[0.035,0.034,0.032],tone:[0.84,0.79,0.62]}
 ];
 /* ------------------------------ params ------------------------------ */
 const Q = new URLSearchParams(location.search);
@@ -438,7 +439,7 @@ function loft(nt,nv,sec){const P=[];for(let i=0;i<=nt;i++){const s=sec(i/nt);con
 /* ------------------------------ palette ------------------------------ */
 const C={black:[0.045,0.043,0.04],nickel:[0.80,0.79,0.76],alu:[0.58,0.575,0.55],rubber:[0.035,0.034,0.032],
  leather:[0.50,0.31,0.15],seatblack:[0.06,0.055,0.05],park:[0.19,0.19,0.185],brass:[0.72,0.56,0.27],bronze:[0.62,0.42,0.22],lens:[1.0,0.93,0.72],red:[0.68,0.08,0.04],
- cream:[0.90,0.86,0.74],gold:[0.84,0.66,0.30],yellow:[0.93,0.74,0.18],redlens:[0.9,0.12,0.06],porcelain:[0.88,0.86,0.80],fabric:[0.10,0.09,0.08],body:[0.3,0.36,0.2],chain:[0.28,0.27,0.25],iron:[0.085,0.085,0.08],white:[0.92,0.91,0.88]};
+ cream:[0.90,0.86,0.74],gold:[0.84,0.66,0.30],yellow:[0.93,0.74,0.18],redlens:[0.9,0.12,0.06],porcelain:[0.88,0.86,0.80],fabric:[0.10,0.09,0.08],body:[0.3,0.36,0.2],chain:[0.28,0.27,0.25],iron:[0.085,0.085,0.08],white:[0.92,0.91,0.88],lime:[0.80,0.77,0.30],tan:[0.80,0.67,0.40],dkred:[0.50,0.05,0.03],creamgold:[0.92,0.84,0.58],shield:[0.85,0.42,0.08]};
 
 /* ----------------------------- geometry ------------------------------
    Units: metres. +X forward, +Y up, +Z = right side of the bike.
@@ -469,17 +470,20 @@ function wheel(c){
 /* deep valanced fender. style: 'stripe' (1932 border pinstripe), 'black' (1933 crown stripes),
    'crown' (1934 second colour on the crown), 'skirt' (1935–36 second colour on the side skirts).
    uStripe (tone) is the scheme's second colour. 1934+ fenders are deeper and flared. */
-function fender(c,a0,a1,Rf,W,style,deepOK){const nt=56,deep=!!deepOK&&style==='skirt';
- const drop=deep?0.55:0.45,edge=deep?0.72:0.78;
- const rad=s=>Rf+0.03*(1-s*s)+0.01*Math.max(0,1-Math.abs(s)*6)-(Math.abs(s)>edge?(Math.abs(s)-edge)*drop:0);
- const wid=s=>s*W*(deep?1.04:1);
+function fender(c,a0,a1,Rf,W,style,deepOK){const nt=56,deep=!!deepOK&&style==='skirt',fl=style==='crown',rear=!!deepOK;
+ // 1934 "new mudguards": flared skirts and, at the rear, a longer tip that kicks out (34RL1158)
+ if(fl&&rear)a1+=0.12;const aT=a1-(a1-a0)*0.16;
+ const drop=deep?0.55:fl?0.30:0.45,edge=deep?0.72:0.78;
+ const kick=a=>fl&&rear&&a>aT?0.03*Math.pow((a-aT)/(a1-aT),1.6):0;
+ const rad=(s,a)=>Rf+0.03*(1-s*s)+0.01*Math.max(0,1-Math.abs(s)*6)-(Math.abs(s)>edge?(Math.abs(s)-edge)*drop:0)+(a===undefined?0:kick(a));
+ const wid=s=>s*W*(deep?1.04:fl?1.06+0.22*Math.max(0,Math.abs(s)-0.72)/0.28:1);
  const strip=(s0,s1,mat,colr)=>{const nw=Math.max(2,Math.round((s1-s0)*10));const P=[];
   for(let i=0;i<=nt;i++){const a=a0+(a1-a0)*i/nt,ca=Math.cos(a),sa=Math.sin(a);const r=[];
-   for(let j=0;j<=nw;j++){const s=lerp(s0,s1,j/nw);r.push([c[0]+rad(s)*ca,c[1]+rad(s)*sa,wid(s)]);}P.push(r);}
+   for(let j=0;j<=nw;j++){const s=lerp(s0,s1,j/nw);r.push([c[0]+rad(s,a)*ca,c[1]+rad(s,a)*sa,wid(s)]);}P.push(r);}
   col(colr,mat);grid(P,false,false);};
- const line=(s,off,r,colr,mat,i0)=>{const pts=[];for(let i=i0;i<=nt-i0;i++){const a=a0+(a1-a0)*i/nt;const rr=rad(s)+off;pts.push([c[0]+rr*Math.cos(a),c[1]+rr*Math.sin(a),wid(s)+(Math.abs(s)>0.9?Math.sign(s)*0.003:0)]);}col(colr,mat);tube(pts,r,5,false,true);};
- if(style==='crown'){strip(-1,-0.42,MAT.BODY,C.body);strip(-0.42,0.42,MAT.STRIPE,C.body);strip(0.42,1,MAT.BODY,C.body);
-  for(const s of [-0.42,0.42])line(s,0.0022,0.0018,C.black,MAT.PAINT,2);}
+ const line=(s,off,r,colr,mat,i0)=>{const pts=[];for(let i=i0;i<=nt-i0;i++){const a=a0+(a1-a0)*i/nt;const rr=rad(s,a)+off;pts.push([c[0]+rr*Math.cos(a),c[1]+rr*Math.sin(a),wid(s)+(Math.abs(s)>0.9?Math.sign(s)*0.003:0)]);}col(colr,mat);tube(pts,r,5,false,true);};
+ if(style==='crown'){const cw=0.64;strip(-1,-cw,MAT.BODY,C.body);strip(-cw,cw,MAT.STRIPE,C.body);strip(cw,1,MAT.BODY,C.body);
+  for(const s of [-cw,cw])line(s,0.0022,0.0022,C.black,MAT.PAINT,2);}
  else if(style==='skirt'){strip(-1,-0.8,MAT.STRIPE,C.body);strip(-0.8,0.8,MAT.BODY,C.body);strip(0.8,1,MAT.STRIPE,C.body);
   for(const s of [-0.8,0.8])line(s,0.002,0.0022,C.gold,MAT.PAINT,2);}
  else{strip(-1,1,MAT.BODY,C.body);
@@ -538,21 +542,25 @@ const BUILD={
  toolbox(){const o=[0.60,0.775,0];col(C.body,MAT.FRAME);
   obox(o,[1,-0.12,0],[0.12,1,0],0.066,0.074,0.17);obox(add(o,[0,0.04,0]),[1,-0.12,0],[0.12,1,0],0.072,0.008,0.176);
   col(C.nickel,MAT.CHROME);for(const s of [-1,1])latheAt(add(o,[0.012,0.012,s*0.0875]),[0,0,s],[[0,0],[0.007,0],[0.007,0.004],[0,0.005]],10,XH);
-  // bar-and-shield transfer on each side
-  for(const s of [-1,1]){const c=add(o,[-0.004,-0.004,s*0.0858]);col(C.cream,MAT.PAINT);obox(c,[1,0,0],[0,1,0],0.034,0.03,0.002);
-   col([0.85,0.42,0.08],MAT.PAINT);obox(add(c,[0,0,s*0.0012]),[1,0,0],[0,1,0],0.03,0.026,0.002);
-   col(C.black,MAT.PAINT);obox(add(c,[0,0.001,s*0.0024]),[1,0,0],[0,1,0],0.04,0.008,0.002);}},
+  // bar-and-shield transfer on each side (32R1307-4): black-edged orange shield, black bar with cream rule
+  const ax=norm([1,-0.12,0]),ay=norm([0.12,1,0]);
+  const sh=k=>[[-0.024*k,0.02*k],[0.024*k,0.02*k],[0.024*k,-0.002*k],[0.016*k,-0.016*k],[0,-0.025*k],[-0.016*k,-0.016*k],[-0.024*k,-0.002*k]];
+  for(const s of [-1,1])withXF(M4.cols(ax,ay,[0,0,s],add(o,[-0.002,-0.004,s*0.0855])),()=>{
+   col(C.black,MAT.PAINT);extrude(sh(1.12),0,0.0012);col(C.shield,MAT.PAINT);extrude(sh(1),0,0.0019);
+   col(C.black,MAT.PAINT);box(0,0.009,0.0021,0.06,0.013,0.0008);col(C.cream,MAT.PAINT);box(0,0.009,0.0026,0.05,0.0026,0.0006);
+   col(C.white,MAT.PAINT);box(0,-0.006,0.0021,0.022,0.0022,0.0006);});},
  headlamp(){const o=[0.578,0.925,0];
   col(C.black,MAT.PAINT);latheAt(o,[1,0,0],[[0,-0.09],[0.036,-0.085],[0.06,-0.062],[0.074,-0.032],[0.079,0],[0.079,0.01]],32);
   col(C.nickel,MAT.CHROME);latheAt(o,[1,0,0],[[0.079,0.01],[0.085,0.013],[0.085,0.023],[0.072,0.027]],32);
   col(C.lens,MAT.GLOW);latheAt(o,[1,0,0],[[0.072,0.026],[0.048,0.034],[0,0.037]],32);
   col(C.park,MAT.ALU);obox([0.49,0.915,0],[1,0.1,0],[0,1,0],0.05,0.018,0.045);
   col(C.black,MAT.PAINT);latheAt(add(o,[-0.01,0.078,0]),[0,1,0],[[0,0],[0.008,0],[0.008,0.018],[0,0.02]],10);},
- horn(){const o=[0.64,0.768,0];col(C.black,MAT.PAINT);
-  latheAt(o,[1,0,0],[[0,-0.02],[0.03,-0.02],[0.034,-0.005],[0.034,0.012],[0.044,0.022],[0.046,0.026]],28);
-  const f=add(o,[0.027,0,0]);col(C.nickel,MAT.CHROME);disc(f,[1,0,0],0.046,0.004,40);
-  col(C.black,MAT.PAINT);for(let i=0;i<16;i++){const a=i/16*TAU,d=[0,Math.cos(a),Math.sin(a)];obox(add(f,add(scl(d,0.026),[0.0045,0,0])),d,[1,0,0],0.034,0.0022,0.0042);}
-  col(C.nickel,MAT.CHROME);latheAt(add(f,[0.004,0,0]),[1,0,0],[[0,0],[0.012,0],[0.01,0.006],[0,0.008]],20);},
+ horn(){const o=[0.643,0.772,0]; // large sunburst horn centred on the toolbox face (32R1307-4, 34RL1158-4)
+  col(C.black,MAT.PAINT);latheAt(o,[1,0,0],[[0,-0.012],[0.034,-0.012],[0.04,0.0],[0.044,0.012],[0.056,0.022],[0.058,0.026]],32);
+  const f=add(o,[0.026,0,0]);col(C.nickel,MAT.CHROME);latheAt(f,[1,0,0],[[0.06,-0.002],[0.062,0.002],[0.06,0.007],[0.054,0.008],[0.054,0.004]],48);
+  disc(f,[1,0,0],0.055,0.004,48);
+  col(C.black,MAT.PAINT);for(let i=0;i<20;i++){const a=i/20*TAU,d=[0,Math.cos(a),Math.sin(a)];obox(add(f,add(scl(d,0.034),[0.0046,0,0])),d,[1,0,0],0.032,0.0034,0.0016);}
+  col(C.nickel,MAT.CHROME);latheAt(add(f,[0.004,0,0]),[1,0,0],[[0,0],[0.016,0],[0.015,0.006],[0.01,0.011],[0,0.013]],24);},
  bars(){const half=s=>[[0.06,0.915,s*0.37],[0.12,0.918,s*0.33],[0.25,0.955,s*0.25],[0.38,0.95,s*0.1],[0.43,0.925,0]];
   col(C.black,MAT.PAINT);tube(smooth(half(-1).concat(half(1).reverse().slice(1)),6),0.011,10,false,true);
   col(C.rubber,MAT.MATTE);for(const s of [-1,1])tube([[0.063,0.915,s*0.367],[0.122,0.918,s*0.327]],0.016,12);
@@ -560,7 +568,8 @@ const BUILD={
  gen(){const o=[0.207,0.238,0];
   // horizontal generator ahead of the crankcase, axis across the bike, gear-driven from the right (photos)
   col(C.black,MAT.PAINT);latheAt(add(o,[0,0,0.075]),[0,0,-1],[[0,0],[0.038,0],[0.042,0.006],[0.042,0.165],[0.044,0.17]],32,XH);
-  col(C.nickel,MAT.CHROME);latheAt(add(o,[0,0,-0.095]),[0,0,-1],[[0.044,0],[0.044,0.006],[0.038,0.018],[0.022,0.027],[0,0.03]],28,XH);
+  col(C.nickel,MAT.CHROME);latheAt(add(o,[0,0,-0.092]),[0,0,-1],[[0.042,0],[0.053,0.002],[0.055,0.008],[0.052,0.015],[0.044,0.026],[0.03,0.036],[0.014,0.041],[0,0.042]],40,XH); // large polished left end-cap (32R1307-3)
+  latheAt(add(o,[0,0,-0.134]),[0,0,-1],[[0,0],[0.009,0],[0.009,0.008],[0,0.009]],16,XH);
   latheAt(add(o,[0,0,-0.02]),[0,0,-1],[[0.0435,0],[0.0435,0.018]],28,XH);
   col(C.alu,MAT.ALU);obox(add(o,[-0.035,-0.005,0.07]),[1,0,0],[0,1,0],0.07,0.06,0.04);
   col(C.black,MAT.PAINT);obox(add(o,[0,0.05,0.0]),[1,0,0],[0,1,0],0.05,0.022,0.06);},
@@ -570,8 +579,12 @@ const BUILD={
   const a=[-0.21,0.13,0.14];
   const muff=(b,L)=>latheAt(a,sub(b,a),[[0,0],[0.018,0],[0.034,0.03],[0.037,0.06],[0.037,L-0.03],[0.032,L],[0.016,L+0.015],[0.016,L+0.03],[0,L+0.03]],24);
   if(k==='low'){const b=[-1.0,0.2,0.14];muff(b,0.76);}
-  else if(k==='hiflo'){const b=[-0.62,0.168,0.14];muff(b,0.38);
-   tube(smooth([[-0.60,0.168,0.14],[-0.78,0.175,0.142],[-0.95,0.19,0.145],[-1.04,0.27,0.146],[-1.08,0.40,0.146]],6),0.017,12,false,true);}
+  else if(k==='hiflo'){const b=[-0.60,0.166,0.14];muff(b,0.36);
+   // 1934 Hi-Flo: full-diameter tail pipe that sweeps up behind the rear wheel (34RL1158)
+   const hp=smooth([[-0.58,0.166,0.14],[-0.74,0.17,0.143],[-0.90,0.185,0.147],[-1.01,0.22,0.15],[-1.085,0.29,0.152],[-1.12,0.37,0.152],[-1.135,0.425,0.152]],8);
+   tube(hp,0.033,16,false,true);
+   const e=hp[hp.length-1],d=norm(sub(e,hp[hp.length-2]));col(C.nickel,MAT.CHROME);latheAt(e,d,[[0.031,-0.006],[0.036,-0.004],[0.036,0.004],[0.031,0.006]],20);
+   col(C.iron,MAT.MATTE);disc(add(e,scl(d,0.004)),d,0.024,0.002,20);col(C.black,MAT.PAINT);}
   else{const b=[-0.70,0.18,0.14];muff(b,0.44);
    // fishtail: flat fan on the end of the muffler
    withXF(M4.trans(0,0,0.14),()=>extrude([[-0.66,0.198],[-0.83,0.228],[-0.845,0.152],[-0.66,0.172]],-0.008,0.008));}
@@ -590,7 +603,10 @@ const BUILD={
   for(const s of [-1,1]){helix([-0.40,0.64,s*0.068],[-0.40,0.768,s*0.068],0.016,7,0.0032);tube([[-0.26,0.64,0],[-0.40,0.64,s*0.068]],0.006,8);}
   col(C.nickel,MAT.CHROME);cylAB([-0.22,0.69,0],[-0.22,0.758,0],0.011,12);latheAt([-0.22,0.71,0],[0,1,0],[[0.022,0],[0.022,0.013],[0.011,0.018]],16);},
  boards(){for(const s of [-1,1]){col(C.park,MAT.ALU);obox([0.17,0.18,s*0.205],[1,0,0],[0,1,0],0.29,0.012,0.11);
-   col(C.rubber,MAT.MATTE);for(let i=0;i<6;i++)obox([0.17,0.189,s*(0.165+i*0.016)],[1,0,0],[0,1,0],0.27,0.007,0.009);
+   // rubber mat: ribs either side of a moulded HARLEY-DAVIDSON band (museum 1935 R)
+   col(C.rubber,MAT.MATTE);obox([0.17,0.1875,s*0.205],[1,0,0],[0,1,0],0.275,0.004,0.1);
+   for(const i of [0,1,4,5])obox([0.17,0.191,s*(0.165+i*0.016)],[1,0,0],[0,1,0],0.27,0.006,0.008);
+   col([0.17,0.165,0.155],MAT.MATTE);glyphRuns('HARLEY-DAVIDSON',0.0172,0.026,false,(x,y,w,h)=>box(0.17+s*x,0.1915,s*0.205-s*y,w,0.004,h));
    col(C.park,MAT.ALU);for(const x of [0.07,0.28])tube([[x,0.115,s*0.055],[x,0.17,s*0.155]],0.007,8);}},
  fwheel(){wheel(F);},
  rwheel(){wheel(R);},
@@ -704,23 +720,41 @@ const BUILD={
     extrude([[0.008,0.013],[-0.07,0.032],[-0.085,0.026],[-0.035,0.01]],0,0.0014);
     col(C.body,MAT.STRIPE);extrude([[0.08,0.003],[0.066,0.008],[0.064,-0.002]],0,0.0022);},0.26,0.34);
    lettering(side,'HARLEY-DAVIDSON',0.55,-0.45,G,G,0.0105,0.016);}
-  else if(k==='d34'){ // 1934: second colour along the top and bottom, flying diamond with speed lines
+  else if(k==='d34'){ // 1934: second colour along the top and bottom, large flying diamond, long speed lines (34RL1158)
    tankPanel(sec,side,0.03,0.97,t=>0.5,t=>0.985,0.0018,C.body,MAT.STRIPE);
    tankPanel(sec,side,0.08,0.92,t=>-0.9,t=>-0.78,0.0018,C.body,MAT.STRIPE);
    tankLine(sec,side,0.04,0.96,t=>0.5,0.0026,0.0016,C.black,MAT.PAINT);
-   emblemAt(side,()=>diamond(C.yellow,C.red,C.red,C.yellow),0.4,0.06);}
-  else if(k==='d35'){ // 1935: second colour on the front of the tank, diamond astride the edge
+   const M=decalMap(side,0.235,0.0),dw=0.085,dh=0.043,xe=y=>-dw*(1-Math.abs(y)/dh);
+   for(const [y,x1] of [[0.012,-0.315],[-0.003,-0.34],[-0.018,-0.29]]){col(C.red,MAT.PAINT);dRect(M,(xe(y)+x1)/2,y,xe(y)-x1+0.004,0.0105,0.0030,10);
+    col(C.lime,MAT.PAINT);dRect(M,(xe(y)+x1)/2+0.001,y,xe(y)-x1,0.0068,0.0036,10);}
+   col(C.red,MAT.PAINT);dDiamond(M,dw+0.006,dh+0.0035,0.0032);col(C.lime,MAT.PAINT);dDiamond(M,dw,dh,0.0040);
+   dText(M,side,'HARLEY',0,0.0095,0.0108,0.0135,C.red,0.0046);dText(M,side,'DAVIDSON',0,-0.0095,0.0108,0.0135,C.red,0.0046);}
+  else if(k==='d35'){ // 1935: second colour on the front of the tank, winged diamond astride the edge (museum 1935 R)
    const edge=kk=>0.27+0.12*(kk+1)/2;
    tankPanelK(sec,side,-0.92,0.97,kk=>0.03,edge,0.0018,C.body,MAT.STRIPE);
    const pts=[];for(let i=0;i<=20;i++){const kk=lerp(-0.9,0.95,i/20);pts.push(onSide(sec,edge(kk),kk,side,0.0026));}col(G,MAT.PAINT);tube(pts,0.0016,5,false,true);
-   emblemAt(side,()=>diamond(G,C.red,C.red,G),0.42,0.04);}
-  else{ // 1936: diagonal band in the second colour, round badge with gold speed lines
-   const mid=kk=>0.36-0.16*kk;
-   tankPanelK(sec,side,-0.92,0.97,kk=>mid(kk)-0.05,kk=>mid(kk)+0.05,0.0018,C.body,MAT.STRIPE);
-   tankPanel(sec,side,0.1,0.9,t=>-0.9,t=>-0.84,0.0018,C.body,MAT.STRIPE);
-   emblemAt(side,()=>{col(C.white,MAT.PAINT);disc([0,0,0.0008],[0,0,1],0.022,0.0012,28);col(C.red,MAT.PAINT);
-    latheAt([0,0,0.0014],[0,0,1],[[0.022,0],[0.016,0],[0.016,0.0012],[0.022,0.0012]],28);disc([0,0,0.0014],[0,0,1],0.008,0.0012,20);
-    col(G,MAT.CHROME);for(let i=0;i<3;i++)box(-0.06-i*0.004,0.01-i*0.01,0.0012,0.07-i*0.012,0.0028,0.0012);},0.22,0.45);}},
+   const M=decalMap(side,0.37,-0.06),dw=0.082,dh=0.042,xe=y=>-dw*(1-Math.abs(y)/dh);
+   // speed lines trailing from the lower rear of the diamond
+   for(const [y,x1] of [[-0.012,-0.30],[-0.022,-0.27],[-0.032,-0.235]]){col(C.dkred,MAT.PAINT);dRect(M,(xe(y)+x1)/2,y,xe(y)-x1+0.004,0.0072,0.0030,10);
+    col(G,MAT.PAINT);dRect(M,(xe(y)+x1)/2+0.001,y,xe(y)-x1,0.0042,0.0036,10);}
+   // three swept wing feathers rising back from the upper rear edge
+   for(let i=0;i<3;i++){const y0=0.004+i*0.0125,th=0.0098,tip=-0.215+i*0.035,lift=0.026+i*0.006;
+    const q=[[xe(y0)+0.004,y0],[tip,y0+lift],[tip+0.016,y0+lift+th],[xe(y0+th)+0.004,y0+th]];
+    col(C.dkred,MAT.PAINT);dQuad(M,...q.map((p,j)=>[p[0]+(j==1||j==2?-0.003:0.002),p[1]+(j<2?-0.0018:0.0018)]),0.0030,8);col(G,MAT.PAINT);dQuad(M,...q,0.0036,8);}
+   col(C.dkred,MAT.PAINT);dDiamond(M,dw+0.0055,dh+0.0032,0.0032);col(C.tan,MAT.PAINT);dDiamond(M,dw,dh,0.0040);
+   dText(M,side,'HARLEY',0,0.0092,0.0104,0.013,C.dkred,0.0046);dText(M,side,'DAVIDSON',0,-0.0096,0.0104,0.013,C.dkred,0.0046);}
+  else{ // 1936: thin diagonal line in the second colour, round badge plus gold HARLEY-DAVIDSON speed-line wordmark (Larson 1936 R)
+   const mid=kk=>lerp(0.92,0.06,(kk+0.86)/1.82);
+   tankPanelK(sec,side,-0.84,0.96,kk=>mid(kk)-0.016,kk=>mid(kk)+0.016,0.0018,C.body,MAT.STRIPE);
+   tankPanel(sec,side,0.1,0.9,t=>-0.9,t=>-0.8,0.0018,C.body,MAT.STRIPE);
+   const M=decalMap(side,0.235,-0.16),rb=0.036,bx0=-0.215;
+   // speed lines above and below the wordmark bar, shortening away from it
+   for(let i=0;i<3;i++)for(const sg of [1,-1]){const y=sg*(0.0155+i*0.0085),x0=bx0+0.03+i*0.03;
+    col(C.black,MAT.PAINT);dRect(M,(x0-0.005)/2,y,-x0+0.004,0.0068,0.0030,8);col(C.creamgold,MAT.PAINT);dRect(M,x0/2,y,-x0,0.0042,0.0036,8);}
+   col(C.black,MAT.PAINT);dRect(M,(bx0-0.002)/2,0,-bx0+0.004,0.0175,0.0030,10);col(C.creamgold,MAT.PAINT);dRect(M,bx0/2,0,-bx0,0.0135,0.0036,10);
+   dText(M,side,'HARLEY-DAVIDSON',-0.126,0,0.0104,0.0096,C.red,0.0044);
+   col(C.black,MAT.PAINT);dRing(M,0,0,0,rb+0.003,0.0040,36);col(C.white,MAT.PAINT);dRing(M,0,0,0,rb,0.0046,36);
+   col(C.red,MAT.PAINT);dRing(M,0,0,0,rb*0.66,0.0052,32);col(C.creamgold,MAT.PAINT);dRect(M,0.004,0,rb*1.5,0.0105,0.0058,6);}},
  ffender(k){fender(F,0.14,2.98,0.345,0.07,k);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[F[0]+0.345*Math.cos(0.55),F[1]+0.345*Math.sin(0.55),s*0.071],[F[0]+0.02,F[1]+0.01,s*0.079]],0.005,6);
    tube([[F[0]+0.345*Math.cos(2.35),F[1]+0.345*Math.sin(2.35),s*0.071],[F[0]-0.02,F[1]+0.01,s*0.079]],0.005,6);}},
  rfender(k){fender(R,0.62,3.32,0.345,0.077,k,true);col(C.body,MAT.FRAME);
@@ -730,8 +764,8 @@ const BUILD={
   col(C.black,MAT.PAINT);tube([[R[0]-0.29,R[1]+0.06,-0.1],[R[0]-0.29,R[1]+0.06,0.1]],0.007,8);},
  tail(k){const a=2.45,o=[R[0]+0.39*Math.cos(a),R[1]+0.39*Math.sin(a)+0.012,0];col(C.black,MAT.PAINT);obox(add(o,[0.01,-0.022,0]),[1,0,0],[0,1,0],0.034,0.02,0.012);
   if(k==='airflow'){ // streamlined teardrop
-   col(C.nickel,MAT.CHROME);loft(20,20,t=>{const x=lerp(o[0]+0.03,o[0]-0.085,t),e=Math.pow(Math.max(Math.sin(Math.PI*clamp(t*0.98+0.01,0,1)),0),0.5)*(0.35+0.65*t);return {x,y:o[1]+0.004,z:0,w:0.03*e+0.0005,h:0.024*e+0.0005,e:2.2};});
-   col(C.redlens,MAT.GLOW);obox([o[0]-0.06,o[1]+0.004,0],[1,0,0],[0,1,0],0.04,0.03,0.05);}
+   col(C.nickel,MAT.CHROME);loft(24,24,t=>{const x=lerp(o[0]+0.04,o[0]-0.115,t),e=Math.pow(Math.max(Math.sin(Math.PI*clamp(t*0.98+0.01,0,1)),0),0.5)*(0.35+0.65*t);return {x,y:o[1]+0.008,z:0,w:0.04*e+0.0005,h:0.032*e+0.0005,e:2.2};});
+   col(C.redlens,MAT.GLOW);obox([o[0]-0.08,o[1]+0.008,0],[1,0,0],[0,1,0],0.05,0.04,0.066);}
   else{col(C.black,MAT.PAINT);latheAt(o,[-1,0,0],[[0,-0.018],[0.024,-0.018],[0.026,0],[0.026,0.026]],20);
    col(C.redlens,MAT.GLOW);latheAt(add(o,[-0.026,0,0]),[-1,0,0],[[0.026,0],[0.024,0.006],[0,0.008]],20);}
   col(C.lens,MAT.GLOW);obox(add(o,[-0.012,-0.032,0]),[1,0,0],[0,1,0],0.02,0.006,0.024);
@@ -745,8 +779,23 @@ function tankPanelK(sec,side,k0,k1,t0f,t1f,off,colr,mat){const nk=24,nt=10,P=[];
 const GLYPH={H:'10001100011000111111100011000110001',A:'01110100011000111111100011000110001',R:'11110100011000111110101001001010001',
  L:'10000100001000010000100001000011111',E:'11111100001000011110100001000011111',Y:'10001100010101000100001000010000100',
  D:'11110100011000110001100011000111110',V:'10001100011000110001100010101000100',I:'01110001000010000100001000010001110',
- S:'01111100001000001110000010000111110',O:'01110100011000110001100011000101110',N:'10001110011010110011100011000110001',
+ S:'01111100001000001110000010000111110',O:'01110100011000110001100011000101110',N:'10001110011100110101100111001110001',
  '-':'00000000000000011111000000000000000'};
+/* 5×7 glyph runs in a reading frame (x right, y up): cb(x,y,w,h) per horizontal run of lit pixels */
+function glyphRuns(txt,step,h,bigFirst,cb){const n=txt.length,px=h/7,pw=step*0.8/5;
+ for(let i=0;i<n;i++){const g=GLYPH[txt[i]];if(!g)continue;const big=bigFirst&&(i===0||txt[i-1]==='-'),sc=big?1.2:1,cx=(i-(n-1)/2)*step;
+  for(let r=0;r<7;r++){let c0=-1;for(let c=0;c<=5;c++){const on=c<5&&g[r*5+c]==='1';if(on&&c0<0)c0=c;if(!on&&c0>=0){
+   cb(cx+((c0+c-1)/2-2)*pw*sc,(3-r)*px*sc+(big?h*0.1:0),(c-c0)*pw*sc,px*sc);c0=-1;}}}}}
+/* decals that follow the tank surface: local X forward (m), Y up (m), lifted off the paint by off */
+function decalMap(side,tc,kc){const sec=tankSec(side*0.062),s0=sec(tc),xc=s0.x,yc=s0.y+kc*s0.h;
+ return (X,Y,off)=>{const t=clamp((0.385-(xc+X))/0.59,0.004,0.996),s=sec(t),k=clamp((yc+Y-s.y)/s.h,-0.985,0.985);return onSide(sec,t,k,side,off);};}
+function dQuad(M,a,b,c,d,off,n){n=n||4;const P=[];for(let i=0;i<=n;i++){const u=i/n,r=[];
+ for(let j=0;j<=n;j++){const v=j/n,p=[lerp(a[0],b[0],u),lerp(a[1],b[1],u)],q=[lerp(d[0],c[0],u),lerp(d[1],c[1],u)];r.push(M(lerp(p[0],q[0],v),lerp(p[1],q[1],v),off));}P.push(r);}
+ grid(P,false,false);}
+function dRect(M,x,y,w,h,off,n){dQuad(M,[x-w/2,y-h/2],[x+w/2,y-h/2],[x+w/2,y+h/2],[x-w/2,y+h/2],off,n||2);}
+function dDiamond(M,w,h,off){dQuad(M,[-w,0],[0,-h],[w,0],[0,h],off,10);}
+function dRing(M,cx,cy,r0,r1,off,seg){const P=[];for(let i=0;i<=seg;i++){const a=i/seg*TAU,ca=Math.cos(a),sa=Math.sin(a);P.push([M(cx+r0*ca,cy+r0*sa,off),M(cx+lerp(r0,r1,0.5)*ca,cy+lerp(r0,r1,0.5)*sa,off),M(cx+r1*ca,cy+r1*sa,off)]);}grid(P,false,false);}
+function dText(M,side,txt,cx,cy,step,h,fill,off){col(fill,MAT.PAINT);glyphRuns(txt,step,h,false,(x,y,w,hh)=>dRect(M,cx+side*x,cy+y,w,hh,off,1));}
 /* lettering placed on a tank side so it reads correctly from that side */
 function lettering(side,txt,t,k,fill,edge,step,h){step=step||0.0118;h=h||0.016;const n=txt.length,px=h/7,pw=step*0.8/5;
  emblemAt(side,()=>{for(let i=0;i<n;i++){const g=GLYPH[txt[i]];if(!g)continue;const big=i===0||txt[i-1]==='-',sc=big?1.25:1,cx=side*(i-(n-1)/2)*step;
