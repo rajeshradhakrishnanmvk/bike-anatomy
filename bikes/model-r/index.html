@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Anatomy of the Harley-Davidson Model R, 1932–1936</title>
+<style>
+:root{--u:1px;--brass:#d8b46a;--ink:#f3ead8;--mute:#b9ad95;--bg:#12100d;--panel:rgba(20,18,14,.86)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b0a08;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;background:#12100d}
+#stage.fixed{left:50%;top:50%;transform:translate(-50%,-50%)}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas.drag{cursor:grabbing} canvas.hot{cursor:pointer}
+#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 45%,rgba(0,0,0,.62) 100%)}
+#titleBlock{position:absolute;left:calc(var(--u)*28);top:calc(var(--u)*22);max-width:calc(var(--u)*640);pointer-events:none}
+#titleBlock .k{font-size:calc(var(--u)*11);letter-spacing:.28em;color:var(--brass);text-transform:uppercase}
+#titleBlock h1{margin:calc(var(--u)*6) 0 calc(var(--u)*4);font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:calc(var(--u)*27);line-height:1.15;color:var(--ink)}
+#titleBlock p{margin:0;font-size:calc(var(--u)*13);color:var(--mute)}
+#toolbar{position:absolute;right:calc(var(--u)*20);top:calc(var(--u)*22);display:flex;gap:calc(var(--u)*6);flex-wrap:wrap;justify-content:flex-end;max-width:60%}
+button{font:inherit;font-size:calc(var(--u)*12.5);color:var(--ink);background:rgba(30,27,21,.8);border:1px solid rgba(216,180,106,.35);border-radius:calc(var(--u)*7);padding:calc(var(--u)*7) calc(var(--u)*11);cursor:pointer;transition:background .2s,border-color .2s}
+button:hover{background:rgba(60,50,32,.9);border-color:var(--brass)}
+button.on{background:rgba(216,180,106,.22);border-color:var(--brass);color:#fff3d6}
+#partsDrawer{position:absolute;left:calc(var(--u)*20);top:calc(var(--u)*118);bottom:calc(var(--u)*150);width:calc(var(--u)*250);background:var(--panel);border:1px solid rgba(216,180,106,.2);border-radius:calc(var(--u)*10);padding:calc(var(--u)*10);overflow:auto;transform:translateX(-120%);transition:transform .35s ease;font-size:calc(var(--u)*12.5)}
+#partsDrawer.open{transform:none}
+#partsDrawer h4{margin:calc(var(--u)*10) 0 calc(var(--u)*4);font-size:calc(var(--u)*10.5);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:600}
+#partsDrawer h4:first-child{margin-top:0}
+#partsDrawer a{display:block;padding:calc(var(--u)*4) calc(var(--u)*6);border-radius:calc(var(--u)*5);color:var(--ink);text-decoration:none;cursor:pointer}
+#partsDrawer a:hover,#partsDrawer a.sel{background:rgba(216,180,106,.16)}
+.dot{display:inline-block;width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:50%;margin-right:calc(var(--u)*7);vertical-align:middle}
+#panel{position:absolute;right:calc(var(--u)*20);top:calc(var(--u)*78);width:calc(var(--u)*370);max-height:calc(100% - var(--u)*240);overflow:auto;background:var(--panel);border:1px solid rgba(216,180,106,.28);border-radius:calc(var(--u)*12);padding:calc(var(--u)*18) calc(var(--u)*20);opacity:0;transform:translateX(calc(var(--u)*30));transition:opacity .35s ease,transform .35s ease;pointer-events:none;box-shadow:0 calc(var(--u)*10) calc(var(--u)*40) rgba(0,0,0,.45)}
+#panel.show{opacity:1;transform:none;pointer-events:auto}
+#panel .x{position:absolute;right:calc(var(--u)*10);top:calc(var(--u)*8);background:none;border:none;font-size:calc(var(--u)*18);color:var(--mute);padding:calc(var(--u)*4)}
+#panel .chip{display:inline-block;font-size:calc(var(--u)*10.5);letter-spacing:.14em;text-transform:uppercase;padding:calc(var(--u)*3) calc(var(--u)*8);border-radius:calc(var(--u)*20);border:1px solid currentColor;margin-bottom:calc(var(--u)*8)}
+#panel h2{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:calc(var(--u)*23);margin:0 0 calc(var(--u)*10);line-height:1.2}
+#panel ul{margin:0;padding-left:calc(var(--u)*16);font-size:calc(var(--u)*13);line-height:1.45}
+#panel li{margin-bottom:calc(var(--u)*5)}
+#panel .fin{margin-top:calc(var(--u)*10);font-size:calc(var(--u)*12);color:var(--mute)}
+#panel .fin b{color:var(--ink);font-weight:600}
+#panel .weak{margin-top:calc(var(--u)*12);border-left:calc(var(--u)*3) solid #c75a4f;background:rgba(199,90,79,.1);padding:calc(var(--u)*8) calc(var(--u)*10);border-radius:0 calc(var(--u)*6) calc(var(--u)*6) 0;font-size:calc(var(--u)*12.5);line-height:1.45}
+#panel .weak h3{margin:0 0 calc(var(--u)*4);font-size:calc(var(--u)*10.5);letter-spacing:.14em;text-transform:uppercase;color:#e58a7f}
+#panel .weak p{margin:0 0 calc(var(--u)*4)}
+#panel .note{margin-top:calc(var(--u)*10);font-size:calc(var(--u)*11.5);color:#d7c38f;font-style:italic}
+#panel .src{margin-top:calc(var(--u)*10);font-size:calc(var(--u)*10.5);color:#8d826d}
+#variants{position:absolute;left:50%;bottom:calc(var(--u)*34);transform:translateX(-50%);display:flex;gap:calc(var(--u)*8)}
+.var{width:calc(var(--u)*196);background:var(--panel);border:1px solid rgba(216,180,106,.22);border-radius:calc(var(--u)*10);padding:calc(var(--u)*8) calc(var(--u)*11);cursor:pointer;transition:border-color .2s,background .2s}
+.var:hover{border-color:rgba(216,180,106,.6)} .var.on{border-color:var(--brass);background:rgba(60,48,26,.9)}
+.var b{font-family:Georgia,serif;font-size:calc(var(--u)*19);color:var(--brass);font-weight:normal;margin-right:calc(var(--u)*6)}
+.var span{font-size:calc(var(--u)*12);color:var(--ink);white-space:nowrap}.var i{font-style:normal;color:var(--brass)}
+.var div{font-size:calc(var(--u)*10.8);color:var(--mute);margin-top:calc(var(--u)*3);line-height:1.35}
+#hint{position:absolute;left:calc(var(--u)*28);bottom:calc(var(--u)*12);font-size:calc(var(--u)*11);color:#8d826d;pointer-events:none}
+#credit{position:absolute;right:calc(var(--u)*20);bottom:calc(var(--u)*12);font-size:calc(var(--u)*11);color:#8d826d;pointer-events:none}
+#tooltip{position:absolute;pointer-events:none;background:rgba(20,18,14,.92);border:1px solid rgba(216,180,106,.4);padding:calc(var(--u)*4) calc(var(--u)*8);border-radius:calc(var(--u)*5);font-size:calc(var(--u)*12);opacity:0;transition:opacity .15s;white-space:nowrap}
+#caption{position:absolute;left:calc(var(--u)*56);bottom:calc(var(--u)*58);max-width:calc(var(--u)*720);opacity:0;transform:translateY(calc(var(--u)*14));transition:opacity .45s ease,transform .45s ease;pointer-events:none;text-shadow:0 2px 18px rgba(0,0,0,.8)}
+#caption.show{opacity:1;transform:none}
+#caption .k{font-size:calc(var(--u)*13);letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
+#caption .t{font-family:Georgia,"Times New Roman",serif;font-size:calc(var(--u)*46);line-height:1.08;margin:calc(var(--u)*6) 0}
+#caption .s{font-size:calc(var(--u)*18);color:#e4d9c1;line-height:1.35}
+#caption .bar{width:calc(var(--u)*64);height:calc(var(--u)*3);background:var(--brass);margin-bottom:calc(var(--u)*12)}
+#card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(14,12,9,.45) 0%,rgba(10,9,7,.82) 75%)}
+#card .in{max-width:calc(var(--u)*980);padding:0 calc(var(--u)*40)}
+#card .k{font-size:calc(var(--u)*15);letter-spacing:.42em;text-transform:uppercase;color:var(--brass)}
+#card h1{font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:calc(var(--u)*56);line-height:1.1;margin:calc(var(--u)*16) 0 calc(var(--u)*14)}
+#card .s{font-size:calc(var(--u)*20);color:#e4d9c1}
+#card .rule{width:calc(var(--u)*120);height:1px;background:var(--brass);margin:calc(var(--u)*22) auto}
+#card .c{font-size:calc(var(--u)*14);color:#a99c82;letter-spacing:.05em}
+body.tour .chrome{display:none!important}
+body.tour canvas{cursor:default}
+body.tour #panel{top:calc(var(--u)*60);right:calc(var(--u)*44);width:calc(var(--u)*400);max-height:none;overflow:hidden}
+body.tour #panel .x{display:none}
+body.tour #panel ul{font-size:calc(var(--u)*14.5)}
+body.tour #panel h2{font-size:calc(var(--u)*26)}
+body.capture #caption,body.capture #panel{transition:none!important}
+body.tour #credit{right:calc(var(--u)*44);bottom:calc(var(--u)*20);font-size:calc(var(--u)*12)}
+#err{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:16px;color:var(--ink);background:#12100d;text-align:center;padding:30px}
+@media (max-width:760px){#panel{left:10px;right:10px;width:auto;top:auto;bottom:10px;max-height:45%}#variants{display:none}#titleBlock h1{font-size:20px}#toolbar{top:auto;bottom:10px;left:10px;right:10px;max-width:none;justify-content:center}#hint{display:none}}
+.var{width:calc(var(--u)*158)}
+.var b{font-size:calc(var(--u)*17)}
+.var.flag{border-color:rgba(232,140,60,.55)}
+.var .cf{display:inline-block;margin-left:calc(var(--u)*4);font-size:calc(var(--u)*10);color:#f0a35a;letter-spacing:.06em}
+#panel .conf{margin-top:calc(var(--u)*12);border-left:calc(var(--u)*3) solid #e88c3c;background:rgba(232,140,60,.11);padding:calc(var(--u)*8) calc(var(--u)*10);border-radius:0 calc(var(--u)*6) calc(var(--u)*6) 0;font-size:calc(var(--u)*12.3);line-height:1.42}
+#panel .conf h3{margin:0 0 calc(var(--u)*4);font-size:calc(var(--u)*10.5);letter-spacing:.14em;text-transform:uppercase;color:#f0a35a}
+#panel .conf h4{margin:0 0 calc(var(--u)*4);font-size:calc(var(--u)*13);font-weight:600;color:var(--ink)}
+#panel .conf p{margin:0 0 calc(var(--u)*4)}
+#panel .conf .kd{font-size:calc(var(--u)*10.5);color:#d8a070;letter-spacing:.05em}
+#panel .conf b{color:#ffd9b0;font-weight:600}
+#panel .nodata{margin-top:calc(var(--u)*6);padding:calc(var(--u)*8) calc(var(--u)*10);border:1px dashed rgba(185,173,149,.45);border-radius:calc(var(--u)*6);font-size:calc(var(--u)*12.5);color:var(--mute);line-height:1.45}
+#panel .yr{display:flex;gap:calc(var(--u)*10);padding:calc(var(--u)*5) calc(var(--u)*8);border-radius:calc(var(--u)*6);font-size:calc(var(--u)*13.5);line-height:1.35;color:#8d826d;transition:none}
+#panel .yr b{font-family:Georgia,serif;font-weight:normal;font-size:calc(var(--u)*17);color:#8d826d;min-width:calc(var(--u)*46)}
+#panel .yr.on{background:rgba(216,180,106,.18);color:var(--ink)}
+#panel .yr.on b{color:var(--brass)}
+#panel .yr.past{color:#c9bda4}
+#panel .yr.past b{color:#b59a63}
+#titleBlock .yl{margin-top:calc(var(--u)*6);font-size:calc(var(--u)*12);color:#d7c38f}
+#bConf{border-color:rgba(232,140,60,.6);color:#ffd2a6}
+#bConf.on{background:rgba(232,140,60,.25)}
+body.tour #panel .yr{font-size:calc(var(--u)*15)}
+#toolbar{max-width:49%}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="vignette"></div>
+  <header id="titleBlock" class="chrome">
+    <div class="k">Bike Anatomy · Episode 4 · 45 ci Flathead V-twin</div>
+    <h1>Anatomy of the Harley-Davidson Model R, 1932–1936</h1>
+    <p>45 cu in air-cooled side-valve V-twin · R · RL · RLD · click any part</p>
+    <div class="yl" id="yearLine"></div>
+  </header>
+  <div id="toolbar" class="chrome">
+    <button id="bParts">Parts list</button>
+    <button id="bExplode">Exploded view</button>
+    <button id="bRotate" class="on">Auto-rotate</button>
+    <button id="bYear">Year: 1932</button>
+    <button id="bFinish">Paint</button>
+    <button id="bConf">⚠ Source conflicts</button>
+    <button id="bReset">Reset view</button>
+    <button id="bTour">▶ Tour</button>
+  </div>
+  <aside id="partsDrawer" class="chrome"></aside>
+  <aside id="panel"></aside>
+  <div id="variants" class="chrome"></div>
+  <div id="hint" class="chrome">Drag to orbit · scroll or pinch to zoom · click a part · E explode · Y year · P paint · C conflicts · T tour</div>
+  <div id="tooltip" class="chrome"></div>
+  <div id="caption"><div class="bar"></div><div class="k"></div><div class="t"></div><div class="s"></div></div>
+  <div id="card"><div class="in"><div class="k"></div><h1></h1><div class="s"></div><div class="rule"></div><div class="c">Data: NotebookLM Studio report, Bike Anatomy notebook</div></div></div>
+  <div id="credit">Data: NotebookLM Studio report, Bike Anatomy notebook</div>
+  <div id="err">WebGL is not available in this browser.</div>
+</div>
+<script>
+'use strict';
+/* Harley-Davidson Model R / RL / RLD (45 cu in side-valve V-twin, 1932–1936) anatomy viewer. Bike Anatomy, episode 4.
+   Pure HTML5 + vanilla JS + raw WebGL1, no dependencies, no external URLs.
+   All part and spec text comes from the NotebookLM Studio report
+   "Technical Anatomy of the 1932–1936 Harley-Davidson Model R, RL, and RLD 45 Flathead".
+   Shapes and colours follow period reference photos (1932 R, 1933 RE, 1934 RL, 1935 RL, 1936 R); proportions are illustrative.
+   Where the report contradicts itself (or the photos), the viewer shows it (CONFLICTS). */
+/* ---------------------------- report data ----------------------------
+   Every spec string below is taken from the NotebookLM Studio report
+   "Technical Anatomy of the 1932–1936 Harley-Davidson Model R, RL, and RLD 45 Flathead"
+   (Bike Anatomy notebook). Section marks (§) refer to that report.
+   Paint colours and part shapes follow reference photos (reference-notes.md), never the report. */
+const SYS = {
+  engine:{name:'Engine & oiling', col:'#e0913a'},
+  trans:{name:'Transmission & clutch', col:'#d4bb45'},
+  drive:{name:'Primary & final drive', col:'#9cc04a'},
+  frame:{name:'Frame & suspension', col:'#5aaed3'},
+  brakes:{name:'Brakes & wheels', col:'#d9685c'},
+  body:{name:'Tanks, body & paint', col:'#a98be0'},
+  elec:{name:'Electrics & controls', col:'#5fcfae'}
+};
+const SYS_ORDER=['engine','trans','drive','frame','brakes','body','elec'];
+const NODATA='No data: the Studio report does not describe this part. The shape follows the reference photos so the bike reads as a whole.';
+/* Conflicts and hedged values. Report-internal ones come from the report's own discrepancy table (§12)
+   or from statements that contradict each other; "report vs. photos" ones are marked as such. Nothing is hidden. */
+const CONFLICTS = {
+ disp:{title:'Displacement: 45.12 or 45.32 cu in?', kind:'Explicit conflict · report §12',
+  a:'45.12 cu in / ~739 cc (Moto Gallery / Classic Build).',
+  b:'45.32 cu in / 742.7 cc (Motorcyclepedia / Wikipedia).',
+  res:'The report puts it down to rounding: nominal 2.75 in × 3.81 in gives ~45.3 cu in, while 2.745 in × 3.8125 in engineering dimensions give ~45.12 cu in. Both figures stay in its spec table.'},
+ hp:{title:'18.5 hp at 6,000–7,000 rpm, or no factory figure?', kind:'Explicit conflict · report §12',
+  a:'18.5 HP @ 6,000–7,000 RPM and a 70 mph top speed (Motorcyclepedia / Wikipedia).',
+  b:'Factory figures unlisted; treat claims cautiously (Moto Gallery).',
+  res:'The report notes that period sales literature did not consistently publish horsepower or top speed across the R, RL and RLD. It does not pick a side.'},
+ wb:{title:'Wheelbase: 57.5 or 57.7 in?', kind:'Explicit conflict · report §7, §12',
+  a:'57.5 inches (1,460 mm) (Wikipedia RL 45).',
+  b:'57.7 inches (Motorcyclepedia RL notes).',
+  res:'Attributed to period measurement differences (front spring fork preload, rear axle adjustment). The model is built to 57.5 in.'},
+ brake:{title:'1935 rear brake: drum or band?', kind:'Explicit conflict · report §6, §12',
+  a:'Classic Motorcycle Build: an internal expanding shoe drum brake was standardized across all 1935 models.',
+  b:'Motorcyclepedia and Wikipedia RL 45: the 1935 RL retained the external contracting band rear brake.',
+  res:'Not resolved in the report. The viewer draws the drum from 1935 and keeps this flag on the part and the year.'},
+ side:{title:'Primary drive: right side (report) or left (photos)?', kind:'Report vs. reference photos · report §4, §12',
+  a:'Report: the 45s “position the primary drive cover, drive chain, and final drive chain on the right-hand side”; spec table: “Right-Side Drive”.',
+  b:'Every reference photo of a 1932–36 R (Yesterdays 32R1307, 32R1205, 33RE1067, 34RL1158) shows the large primary chain cover on the LEFT; the final-drive chain runs on the right.',
+  res:'The viewer follows the photos for the primary (left) and the report and photos for the final drive (right). The report text is shown unchanged.'},
+ deco:{title:'Art Deco tank graphics: 1934 or already 1933?', kind:'Report vs. reference photos · report §1, §8, §11',
+  a:'Report: 1933 brought only “revised tank striping and trim”; Art Deco stylised tank graphics arrive in 1934.',
+  b:'The 1933 reference bike (Yesterdays 33RE1067) wears a gold Art Deco eagle on a red panel.',
+  res:'The viewer draws the eagle for 1933 from the photo and labels it as a photo-based shape.'},
+ tail:{title:'1935 tail light: “re-stamped with engine numbers”?', kind:'Unclear claim · report §8, §11',
+  a:'§8 and §11: early 1935 models carried over leftover 1934 streamline tail lights, “re-stamped with 1935 engine numbers”.',
+  b:'The same report says engine numbers are stamped on the left crankcase pad (§2, §13). It never says what tail light replaced the streamline lamp.',
+  res:'The sentence mixes up tail lights and engine numbers, and the report gives no later lamp. The viewer keeps the streamline lamp for 1935–36 (assumption).'},
+ prod:{title:'Production: 819 or unrecorded?', kind:'Hedged value · report §12',
+  a:'819 units for the 1935 RL model (Motorcyclepedia).',
+  b:'Total R-series production unrecorded (Moto Gallery).',
+  res:'819 is a single model-year figure; the report gives no total for the R, RL and RLD.'}
+};
+const CONF_ORDER=['disp','hp','wb','brake','side','deco','tail','prod'];
+const DATA = {
+ cyl:{sys:'engine',name:'Cylinders & heads',sec:'§2, §10, §12',specs:[
+  'Air-cooled, 45-degree side-valve (flathead) V-twin',
+  'Bore 2.75 in (2-3/4 in / 70 mm) × stroke 3.81 in (3-13/16 in / 97 mm)',
+  'Heads are simple, cost-effective castings needing only cooling fins and threaded spark-plug ports',
+  'Compact layout lowers engine height and centre of gravity, with broad low-speed torque',
+  '1935: redesigned heads with optimized cooling fin geometry',
+  'R: low-compression heads for low-octane commercial fuel · RL / RLD: higher-compression heads (numerical ratios unlisted)'],
+  conf:['disp','hp']},
+ valves:{sys:'engine',name:'Side valves',sec:'§2',specs:[
+  'All valves sit vertically in the cylinder block, alongside the bores',
+  'No overhead pushrods, rocker arms or rocker boxes',
+  '1935: heavier valve springs for valvetrain control at higher engine speeds']},
+ crank:{sys:'engine',name:'Crankcase & engine number pad',sec:'§2, §13',specs:[
+  'Cast in matching aluminum halves',
+  'Left case carries the stamped pad with the engine number, the primary vehicle identifier on pre-1970 Harleys',
+  '1936-and-earlier flywheels have unique oil holes and key-ways: not interchangeable with 1937+ W-series flywheels',
+  '1935: larger-diameter flywheels to smooth out engine pulses'],
+  work:['Prewar alloy cases can crack around the left-side number pad, lower motor-mount ears and main bearing bosses.','Check the number pad for font style, spacing, grinding marks and re-stamping.']},
+ oilpump:{sys:'engine',name:'Engine-driven oil pump',sec:'§2, §13',specs:[
+  'Total-loss oiling: oil is metered to bearings and cylinder walls, then consumed or vented, never returned to the tank',
+  'Fed from the 7.5-pint reservoir in the split left tank',
+  '1935: improved pump for more precise metering and reliability',
+  'The successor 1937 W-series switched to recirculating oiling'],
+  work:['Unmonitored pump delivery under sustained load starves the top end: cylinder scoring and valve seat recession.']},
+ carb:{sys:'engine',name:'Carburetor & intake',sec:'§10',specs:[
+  'Model R: standard carburetion',
+  'Model RLD: special intake and carburetor tuning'],
+  note:'The report names no carburetor make or model.'},
+ exhaust:{sys:'engine',name:'Exhaust & muffler',nodata:true},
+ gear:{sys:'trans',name:'3-speed transmission',sec:'§3, §12, §13',specs:[
+  'Non-unit, separate three-speed hand-shift gearbox behind the crankcase',
+  '1932–1934: sliding-gear engagement',
+  '1935–1936: constant-mesh gearbox, with better engagement, less tooth shearing under load and longer life'],
+  work:['Verify that a 1935+ machine still has its period-correct constant-mesh gearbox.']},
+ clutch:{sys:'trans',name:'Foot clutch',sec:'§3, §9',specs:[
+  'Left-foot rocker pedal releases the clutch from the transmission mainshaft',
+  '1935: four-plate clutch with more friction area, more torque capacity and less slip']},
+ shifter:{sys:'trans',name:'Tank hand lever & shift gate',sec:'§3, §9, §13',specs:[
+  'Hand lever on the tank selects the 3 speeds through a notched frame/tank-mounted shift gate'],
+  work:['Worn gates, shift rods and gear dogs let gears pop out under load: check clevis joints and rod play.']},
+ kick:{sys:'trans',name:'Kick starter',sec:'§9',specs:['Manual kick-starter arm on the right engine case']},
+ primary:{sys:'drive',name:'Duplex primary chain',sec:'§4',specs:[
+  'Heavy-duty duplex chain from the crankshaft sprocket to the transmission clutch shell'],conf:['side']},
+ pcover:{sys:'drive',name:'Primary cover',sec:'§4, §12',specs:[
+  'Protective metal cover over the primary chain',
+  'Report: small-twin 45s put the primary cover and chains on the right; big twins on the left'],conf:['side']},
+ final:{sys:'drive',name:'Final drive chain',sec:'§4',specs:[
+  'Single-strand roller chain from the transmission output sprocket to the rear hub sprocket']},
+ frame:{sys:'frame',name:'Single-downtube frame',sec:'§1, §5, §7, §13',specs:[
+  'Rigid single-downtube frame: tubular steel joined by heavy forged steel sockets and frame plates',
+  '1932: front lower forgings and motor-mount plates redesigned so the generator mounts horizontally',
+  '1935: forgings and stress points reinforced with gusseting for torsional rigidity',
+  'Wheelbase 57.5 in (1,460 mm) or 57.7 in, depending on source'],
+  work:['R-series single-downtube frames are unique; a retrofitted later WL frame reduces correctness and value.'],conf:['wb']},
+ fork:{sys:'frame',name:'Leading-link springer fork',sec:'§5, §13',specs:[
+  'Exposed twin main springs plus recoil springs',
+  'Road shocks pass through mechanical rocker links at the front axle hub'],
+  work:['Check steering-head neck forgings and the springer rocker links.']},
+ toolbox:{sys:'body',name:'Fork tool box',nodata:true},
+ saddle:{sys:'frame',name:'Sprung saddle',sec:'§5',specs:[
+  'Unsprung rigid rear: rider comfort comes from the saddle’s internal spring-piston mechanism, tyre deflection and frame compliance']},
+ boards:{sys:'frame',name:'Footboards',nodata:true},
+ fwheel:{sys:'brakes',name:'Front wheel & tyre',sec:'§7',specs:[
+  '18-inch wire-spoke wheel, 4.00 × 18 tyre',
+  '1935: hub-drive speedometer drive built into the wheel assembly']},
+ rwheel:{sys:'brakes',name:'Rear wheel & tyre',sec:'§7',specs:[
+  '18-inch wire-spoke wheel, 4.00 × 18 tyre',
+  '1935: quickly detachable, removable without disconnecting the drive chain']},
+ fbrake:{sys:'brakes',name:'Front drum brake',sec:'§6',specs:[
+  'Cable-actuated mechanical internal expanding shoe drum inside the front hub']},
+ rbrake:{sys:'brakes',name:'Rear brake',sec:'§1, §6, §12',specs:[
+  'Pre-1935 solo models: external contracting band clamped around the outside of the drum',
+  '1935–1936: internal expanding shoe drum, per one source (see conflict)',
+  'From 1935: carburized steel drum with harder friction linings'],
+  work:['Cable-and-rod drums need real lever effort and careful lining adjustment.'],conf:['brake']},
+ tank:{sys:'body',name:'Fuel tank (right half)',sec:'§8',specs:[
+  'Split steel tanks straddle the frame',
+  'Right tank: 3.75 US gallons of gasoline',
+  '“Strap Tank” is a misnomer here: it means 1900s singles held on with nickel-plated straps']},
+ oiltank:{sys:'body',name:'Oil tank (left half)',sec:'§2, §8',specs:[
+  'Left tank: 7.5-pint reservoir for the total-loss system']},
+ graphics:{sys:'body',name:'Tank graphics',sec:'§1, §8',specs:[
+  '1932: simplified panel striping and clean enamel colours',
+  '1933: revised striping and trim',
+  '1934: automotive-inspired Art Deco tank graphics, added to attract buyers without retooling',
+  '1936: updated tank decals and revised paint schemes'],
+  note:'Graphic shapes and colours follow reference photos; the report names no colours.',conf:['deco']},
+ ffender:{sys:'body',name:'Front fender',nodata:true},
+ rfender:{sys:'body',name:'Rear fender',sec:'§8, §13',specs:[
+  '1935: prominent skirted rear fender, for more spray protection and a fuller look'],
+  work:['Many survivors carry retrofitted 1939+ WL rear fenders: check the contour.']},
+ tail:{sys:'body',name:'Tail light',sec:'§8, §11',specs:[
+  '1934: streamline tail light on the rear fender',
+  'Early 1935: leftover 1934 streamline tail lights carried over'],conf:['tail']},
+ horn:{sys:'elec',name:'Horn',sec:'§9',specs:['Part of the 6-volt circuit'],note:'Shape and position follow the photos.'},
+ gen:{sys:'elec',name:'Horizontal generator',sec:'§1, §5, §9',specs:[
+  'Mounted horizontally in front of the crankcase, shielding the electrical unit',
+  'Replaced the D-series vertical generator, the “3-cylinder Harley”',
+  '1935: upgraded high-output generator for better battery charging']},
+ ign:{sys:'elec',name:'Breaker points & coil',sec:'§9',specs:[
+  'Breaker point and ignition coil assembly powered by a 6-volt battery']},
+ battery:{sys:'elec',name:'6-volt battery',sec:'§9',specs:['6-volt storage battery'],note:'The report gives no battery specs.'},
+ headlamp:{sys:'elec',name:'Headlamp',sec:'§9',specs:['Incandescent headlamp on the 6-volt circuit'],note:'The report gives no lamp size or year changes; shape follows the photos.'},
+ bars:{sys:'elec',name:'Handlebars & controls',sec:'§9',specs:[
+  'Tubular steel bars with internal control spirals',
+  'Right grip: throttle · left grip: spark advance',
+  'Left foot: rocker clutch · right foot: rear brake']}
+};
+const SUFFIXES='The report finds no RS or RE codes for 1932–1936 in its sources.';
+const VARIANTS = [
+ {code:'R', label:'Base solo', info:'1932–1936', parts:['cyl'],
+  text:'Base civilian solo road motorcycle with standard-compression heads for low-octane commercial fuel, standard carburetion and total-loss oiling.'},
+ {code:'RL', label:'Higher compression', info:'1932–1936', parts:['cyl'],
+  text:'Higher-compression civilian solo model with more horsepower for sports and highway riding. 819 units are documented for the 1935 RL.'},
+ {code:'RLD', label:'Sport tuning', info:'mid-1930s', parts:['cyl','carb'],
+  text:'High-performance civilian variant: factory sport tuning, high-compression heads and special intake/carburetor tuning.'},
+ {code:'RLDR', label:'Racing', info:'mid-1930s', parts:['cyl','frame'],
+  text:'Stripped, race-tuned derivative for dirt track and Class C competition, and the precursor to the factory WR racer.'},
+ {code:'G', label:'Servi-Car', info:'1932–1973', parts:['cyl','gear'],
+  text:'Related 45 cu in commercial three-wheeler, introduced late in 1931 for 1932, with a trike frame and rear axle differential. In production through 1973.'},
+ {code:'Rikuo', label:'Licensed in Japan', info:'prewar', parts:['frame'],
+  text:'Before World War II, Harley-Davidson licensed production of the RL and the Servi-Car to Japan’s Rikuo.'}
+];
+const YEARS=[1932,1933,1934,1935,1936];
+const YEAR_NOTES={
+ 1932:'Replaces the D-series · front lower forgings redesigned for a horizontal generator · simplified panel striping',
+ 1933:'Detail trim updates and minor finish adjustments in the depth of the Depression',
+ 1934:'Art Deco tank graphics · streamline tail light · sold over a 16-month cycle',
+ 1935:'Major overhaul: constant-mesh gearbox, 4-plate clutch, skirted rear fender, hub-drive speedometer, new generator',
+ 1936:'Final R-series year · updated tank decals and paint schemes'
+};
+/* colours approximated from the reference photos; the report names no factory colours */
+const PAINTS=[
+ {id:'olive',name:'Olive & vermilion',years:'1932 photo',year:1932,body:[0.27,0.31,0.14],frame:[0.27,0.31,0.14],tone:[0.86,0.28,0.06]},
+ {id:'black',name:'Black & red',years:'1933 photo',year:1933,body:[0.035,0.034,0.032],frame:[0.035,0.034,0.032],tone:[0.66,0.07,0.04]},
+ {id:'silver',name:'Silver & orange',years:'1934 photo',year:1934,body:[0.66,0.67,0.68],frame:[0.035,0.034,0.032],tone:[0.86,0.36,0.08]},
+ {id:'gable',name:'Red (Clark Gable’s 1934 RL45)',years:'report §11: a red 1934 RL45',year:0,body:[0.62,0.07,0.05],frame:[0.035,0.034,0.032],tone:[0.86,0.66,0.30]},
+ {id:'red',name:'Red & black',years:'1935 photo',year:1935,body:[0.72,0.12,0.05],frame:[0.035,0.034,0.032],tone:[0.035,0.034,0.032]},
+ {id:'gold',name:'Gold & black',years:'1936 photo',year:1936,body:[0.55,0.43,0.17],frame:[0.035,0.034,0.032],tone:[0.035,0.034,0.032]}
+];
+/* ------------------------------ params ------------------------------ */
+const Q = new URLSearchParams(location.search);
+const TOUR = Q.get('tour') === '1';
+const FW = parseInt(Q.get('w'),10)||0, FH = parseInt(Q.get('h'),10)||0;
+const T0 = parseFloat(Q.get('t'))||0;
+const FREEZE = Q.get('freeze') === '1';
+const CAPTURE = Q.get('capture') === '1';   // fixed-timestep frame capture: window.__renderAt(t)
+
+/* ------------------------------ vec/mat ------------------------------ */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const scl=(a,s)=>[a[0]*s,a[1]*s,a[2]*s], dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const len=a=>Math.hypot(a[0],a[1],a[2]);
+const norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l,a[2]/l];};
+const lerp=(a,b,t)=>a+(b-a)*t, lerp3=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const ease=t=>{t=clamp(t,0,1);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};
+const TAU=Math.PI*2;
+const M4={
+ id(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m;},
+ mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+r]*b[c*4+k];o[c*4+r]=s;}return o;},
+ trans(x,y,z){const m=M4.id();m[12]=x;m[13]=y;m[14]=z;return m;},
+ scale(x,y,z){const m=M4.id();m[0]=x;m[5]=y;m[10]=z;return m;},
+ persp(fovy,asp,n,f){const t=1/Math.tan(fovy/2),m=new Float32Array(16);m[0]=t/asp;m[5]=t;m[10]=(f+n)/(n-f);m[11]=-1;m[14]=2*f*n/(n-f);return m;},
+ lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);const m=new Float32Array(16);
+  m[0]=x[0];m[4]=x[1];m[8]=x[2];m[1]=y[0];m[5]=y[1];m[9]=y[2];m[2]=z[0];m[6]=z[1];m[10]=z[2];
+  m[12]=-dot(x,e);m[13]=-dot(y,e);m[14]=-dot(z,e);m[15]=1;return m;},
+ cols(x,y,z,o){const m=new Float32Array(16);m[0]=x[0];m[1]=x[1];m[2]=x[2];m[4]=y[0];m[5]=y[1];m[6]=y[2];m[8]=z[0];m[9]=z[1];m[10]=z[2];m[12]=o[0];m[13]=o[1];m[14]=o[2];m[15]=1;return m;}
+};
+/* frame whose local Y = axis and local X follows the hint */
+function basisY(o,axis,hint){const y=norm(axis);let h=hint||(Math.abs(y[1])<0.95?[0,1,0]:[1,0,0]);
+ if(Math.abs(dot(norm(h),y))>0.98)h=Math.abs(y[0])<0.9?[1,0,0]:[0,0,1];const x=norm(sub(h,scl(y,dot(h,y))));const z=cross(x,y);return M4.cols(x,y,z,o);}
+
+/* --------------------------- mesh builder --------------------------- */
+let V=null, XF=M4.id(), NM=[1,0,0,0,1,0,0,0,1], CUR=[1,1,1,0];
+function setXF(m){XF=m;const a0=[m[0],m[1],m[2]],a1=[m[4],m[5],m[6]],a2=[m[8],m[9],m[10]];
+ const c0=cross(a1,a2),c1=cross(a2,a0),c2=cross(a0,a1);NM=[c0[0],c0[1],c0[2],c1[0],c1[1],c1[2],c2[0],c2[1],c2[2]];} // inverse-transpose up to scale
+function withXF(m,fn){const p=XF;setXF(M4.mul(p,m));fn();setXF(p);}
+const MAT={PAINT:0,CHROME:1,MATTE:2,ALU:3,GLOW:4,BODY:5,FRAME:6,STRIPE:7};
+function col(c,mat){CUR=[c[0],c[1],c[2],(mat||0)/8];}
+function emit(p,n){const m=XF,x=p[0],y=p[1],z=p[2];
+ V.push(m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]);
+ const N=NM;const nx=N[0]*n[0]+N[3]*n[1]+N[6]*n[2],ny=N[1]*n[0]+N[4]*n[1]+N[7]*n[2],nz=N[2]*n[0]+N[5]*n[1]+N[8]*n[2];
+ const l=Math.hypot(nx,ny,nz)||1;V.push(nx/l,ny/l,nz/l,CUR[0],CUR[1],CUR[2],CUR[3]);}
+function tri(a,b,c,na,nb,nc){emit(a,na);emit(b,nb||na);emit(c,nc||na);}
+function quad(a,b,c,d,na,nb,nc,nd){tri(a,b,c,na,nb,nc);tri(a,c,d,na,nc,nd);}
+function box(cx,cy,cz,sx,sy,sz){const x0=cx-sx/2,x1=cx+sx/2,y0=cy-sy/2,y1=cy+sy/2,z0=cz-sz/2,z1=cz+sz/2;
+ quad([x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1],[1,0,0]);quad([x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0],[-1,0,0]);
+ quad([x0,y1,z0],[x0,y1,z1],[x1,y1,z1],[x1,y1,z0],[0,1,0]);quad([x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1],[0,-1,0]);
+ quad([x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1]);quad([x0,y0,z0],[x0,y1,z0],[x1,y1,z0],[x1,y0,z0],[0,0,-1]);}
+/* oriented box */
+function obox(c,xd,yd,sx,sy,sz){const x=norm(xd);const y=norm(sub(yd,scl(x,dot(yd,x))));const z=cross(x,y);withXF(M4.cols(x,y,z,c),()=>box(0,0,0,sx,sy,sz));}
+/* surface of revolution around local Y; prof = [[r,h],...] */
+function lathe(prof,seg){seg=seg||24;
+ for(let k=0;k<prof.length-1;k++){const[r0,h0]=prof[k],[r1,h1]=prof[k+1];let nr=h1-h0,nh=-(r1-r0);const l=Math.hypot(nr,nh)||1;nr/=l;nh/=l;
+  for(let j=0;j<seg;j++){const a0=j/seg*TAU,a1=(j+1)/seg*TAU,c0=Math.cos(a0),s0=Math.sin(a0),c1=Math.cos(a1),s1=Math.sin(a1);
+   quad([r0*c0,h0,r0*s0],[r0*c1,h0,r0*s1],[r1*c1,h1,r1*s1],[r1*c0,h1,r1*s0],[nr*c0,nh,nr*s0],[nr*c1,nh,nr*s1],[nr*c1,nh,nr*s1],[nr*c0,nh,nr*s0]);}}}
+function latheAt(o,axis,prof,seg,hint){withXF(basisY(o,axis,hint),()=>lathe(prof,seg));}
+function disc(o,axis,r,t,seg){latheAt(o,axis,[[0,0],[r,0],[r,t],[0,t]],seg||24);}
+/* grid surface with smooth normals from central differences */
+function grid(P,closeU,closeV){const nu=P.length,nv=P[0].length,N=[];
+ const g=(i,j)=>{i=closeU?(i+nu)%nu:clamp(i,0,nu-1);j=closeV?(j+nv)%nv:clamp(j,0,nv-1);return P[i][j];};
+ let cen=[0,0,0];for(const r of P)for(const p of r)cen=add(cen,p);cen=scl(cen,1/(nu*nv));
+ for(let i=0;i<nu;i++){N.push([]);for(let j=0;j<nv;j++){let n=cross(sub(g(i+1,j),g(i-1,j)),sub(g(i,j+1),g(i,j-1)));if(len(n)<1e-12)n=sub(P[i][j],cen);N[i].push(norm(n));}}
+ const iu=closeU?nu:nu-1,iv=closeV?nv:nv-1;
+ for(let i=0;i<iu;i++)for(let j=0;j<iv;j++){const i1=(i+1)%nu,j1=(j+1)%nv;quad(P[i][j],P[i1][j],P[i1][j1],P[i][j1],N[i][j],N[i1][j],N[i1][j1],N[i][j1]);}}
+/* Catmull-Rom smoothing of a polyline */
+function smooth(pts,n){if(pts.length<3)return pts;n=n||6;const o=[];
+ for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(i-1,0)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(i+2,pts.length-1)];
+  for(let s=0;s<n;s++){const t=s/n,t2=t*t,t3=t2*t;o.push([0,1,2].map(k=>0.5*((2*p1[k])+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t3)));}}
+ o.push(pts[pts.length-1]);return o;}
+/* swept tube with parallel-transport frames */
+function tube(pts,r,seg,closed,caps){seg=seg||10;const n=pts.length;if(n<2)return;const T=[];
+ for(let i=0;i<n;i++){let a,b;if(closed){a=pts[(i-1+n)%n];b=pts[(i+1)%n];}else{a=pts[Math.max(i-1,0)];b=pts[Math.min(i+1,n-1)];}T.push(norm(sub(b,a)));}
+ let Nn=Math.abs(T[0][1])<0.9?[0,1,0]:[1,0,0];Nn=norm(sub(Nn,scl(T[0],dot(Nn,T[0]))));
+ const P=[];for(let i=0;i<n;i++){if(i>0)Nn=norm(sub(Nn,scl(T[i],dot(Nn,T[i]))));const B=cross(T[i],Nn);const ring=[];
+  for(let j=0;j<seg;j++){const a=j/seg*TAU;ring.push(add(pts[i],add(scl(Nn,Math.cos(a)*r),scl(B,Math.sin(a)*r))));}P.push(ring);}
+ grid(P,!!closed,true);
+ if(!closed&&caps!==false){for(const [i,s] of [[0,-1],[n-1,1]]){const c=pts[i],rg=P[i],nn=scl(T[i],s);for(let j=0;j<seg;j++)tri(c,rg[j],rg[(j+1)%seg],nn);}}}
+function cylAB(a,b,r,seg){tube([a,b],r,seg||10,false,true);}
+function circlePts(c,r,n,a0,a1,plane){a0=a0||0;a1=(a1===undefined)?TAU:a1;const o=[];const full=Math.abs(a1-a0-TAU)<1e-6;const m=full?n:n+1;
+ for(let i=0;i<m;i++){const a=a0+(a1-a0)*i/n;o.push(plane==='xz'?[c[0]+r*Math.cos(a),c[1],c[2]+r*Math.sin(a)]:[c[0]+r*Math.cos(a),c[1]+r*Math.sin(a),c[2]]);}return o;}
+function helix(a,b,R,turns,wr){const ax=sub(b,a),L=len(ax),M=basisY(a,ax);const pts=[];const n=Math.ceil(turns*16);
+ for(let i=0;i<=n;i++){const t=i/n,ang=t*turns*TAU;const lp=[R*Math.cos(ang),t*L,R*Math.sin(ang)];
+  pts.push([M[0]*lp[0]+M[4]*lp[1]+M[8]*lp[2]+M[12],M[1]*lp[0]+M[5]*lp[1]+M[9]*lp[2]+M[13],M[2]*lp[0]+M[6]*lp[1]+M[10]*lp[2]+M[14]]);}
+ tube(pts,wr,6,false,true);}
+/* extrude a convex 2D polygon (xy) between z0..z1 */
+function extrude(poly,z0,z1){let c=[0,0];for(const p of poly){c[0]+=p[0];c[1]+=p[1];}c=[c[0]/poly.length,c[1]/poly.length];const n=poly.length;
+ for(let i=0;i<n;i++){const a=poly[i],b=poly[(i+1)%n];tri([c[0],c[1],z1],[a[0],a[1],z1],[b[0],b[1],z1],[0,0,1]);tri([c[0],c[1],z0],[b[0],b[1],z0],[a[0],a[1],z0],[0,0,-1]);
+  const nn=norm([b[1]-a[1],-(b[0]-a[0]),0]);quad([a[0],a[1],z0],[b[0],b[1],z0],[b[0],b[1],z1],[a[0],a[1],z1],nn);}}
+/* closed belt / hull path around two circles in the xy plane */
+function beltPath(c1,r1,c2,r2,step,z){const d=Math.hypot(c2[0]-c1[0],c2[1]-c1[1]);const u=[(c2[0]-c1[0])/d,(c2[1]-c1[1])/d],v=[-u[1],u[0]];
+ const beta=Math.asin(clamp((r1-r2)/d,-1,1)),A=Math.PI/2-beta;const pts=[];const at=(c,r,a)=>[c[0]+r*(Math.cos(a)*u[0]+Math.sin(a)*v[0]),c[1]+r*(Math.cos(a)*u[1]+Math.sin(a)*v[1]),z];
+ const n1=Math.max(8,Math.round(r1*(TAU-2*A)/step)),n2=Math.max(8,Math.round(r2*2*A/step));
+ for(let i=0;i<=n1;i++)pts.push(at(c1,r1,A+(TAU-2*A)*i/n1));
+ for(let i=0;i<=n2;i++)pts.push(at(c2,r2,-A+2*A*i/n2));return pts;}
+function resample(pts,step,closed){const P=closed?pts.concat([pts[0]]):pts;const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+len(sub(P[i],P[i-1])));
+ const tot=L[L.length-1],n=Math.floor(tot/step),o=[];let k=1;for(let i=0;i<n;i++){const s=i*tot/n;while(k<L.length-1&&L[k]<s)k++;const t=(s-L[k-1])/((L[k]-L[k-1])||1);o.push({p:lerp3(P[k-1],P[k],t),d:norm(sub(P[k],P[k-1]))});}return o;}
+/* superellipse loft along x */
+function loft(nt,nv,sec){const P=[];for(let i=0;i<=nt;i++){const s=sec(i/nt);const r=[];
+ for(let j=0;j<nv;j++){const a=j/nv*TAU,ca=Math.cos(a),sa=Math.sin(a);const ex=2/s.e;
+  r.push([s.x,s.y+s.h*Math.sign(sa)*Math.pow(Math.abs(sa),ex),s.z+s.w*Math.sign(ca)*Math.pow(Math.abs(ca),ex)]);}P.push(r);}
+ grid(P,false,true);}
+
+
+/* ------------------------------ palette ------------------------------ */
+const C={black:[0.045,0.043,0.04],nickel:[0.80,0.79,0.76],alu:[0.58,0.575,0.55],rubber:[0.035,0.034,0.032],
+ leather:[0.50,0.31,0.15],seatblack:[0.06,0.055,0.05],park:[0.19,0.19,0.185],brass:[0.72,0.56,0.27],bronze:[0.62,0.42,0.22],lens:[1.0,0.93,0.72],red:[0.68,0.08,0.04],
+ cream:[0.90,0.86,0.74],gold:[0.84,0.66,0.30],yellow:[0.93,0.74,0.18],redlens:[0.9,0.12,0.06],porcelain:[0.88,0.86,0.80],fabric:[0.10,0.09,0.08],body:[0.3,0.36,0.2],chain:[0.28,0.27,0.25],iron:[0.085,0.085,0.08],white:[0.92,0.91,0.88]};
+
+/* ----------------------------- geometry ------------------------------
+   Units: metres. +X forward, +Y up, +Z = right side of the bike.
+   Proportions are read off the reference photos in reference-notes.md (Yesterdays 1932 R 32R1307,
+   1934 RL 34RL1158, Mecum 1935 RL, Larson 1936 R): wheelbase ≈ 4.75 tyre radii, tank top ≈ 2.6 radii,
+   headlamp centre ≈ 3 radii above the ground. Wheelbase set to 57.5 in (1.46 m), the figure in the report.
+   The 45 cu in engine reuses the V/VL flathead builders, scaled down about the crankshaft (ENG). */
+const F=[0.73,0.31,0], R=[-0.73,0.31,0];
+const OCR=[0.04,0.31,0], OTR=[-0.35,0.335,0];                     // V/VL builder space
+const OB1=[0.09,0.44,0], A1=norm([Math.sin(Math.PI/8),Math.cos(Math.PI/8),0]);
+const OB2=[-0.01,0.44,0], A2=norm([-Math.sin(Math.PI/8),Math.cos(Math.PI/8),0]);   // 45° V
+const ES=0.82, CR=[0.03,0.275,0];
+const map=p=>[CR[0]+(p[0]-OCR[0])*ES,CR[1]+(p[1]-OCR[1])*ES,p[2]*ES];
+const TR=map(OTR), B1=map(OB1), B2=map(OB2);
+function ENG(fn){withXF(M4.mul(M4.trans(CR[0],CR[1],CR[2]),M4.mul(M4.scale(ES,ES,ES),M4.trans(-OCR[0],-OCR[1],-OCR[2]))),fn);}
+const H1=[0.39,0.868,0], H2=[0.455,0.755,0], TT0=[0.41,0.82,0], S1=[-0.22,0.70,0], S2=[-0.25,0.15,0];   // head tube raked ~30° (photos)
+const topTubeY=x=>S1[1]+(x-S1[0])/(TT0[0]-S1[0])*(TT0[1]-S1[1]);
+const Z=[0,0,1], XH=[1,0,0];
+
+function wheel(c){
+ col(C.rubber,MAT.MATTE);tube(circlePts(c,0.257,72),0.053,16,true);
+ // drop-centre steel rim
+ col(C.black,MAT.PAINT);latheAt(c,Z,[[0.222,-0.034],[0.214,-0.031],[0.209,-0.019],[0.199,-0.011],[0.197,0],[0.199,0.011],[0.209,0.019],[0.214,0.031],[0.222,0.034]],72,XH);
+ col(C.black,MAT.PAINT);latheAt(c,Z,[[0.012,-0.06],[0.02,-0.06],[0.02,-0.049],[0.044,-0.044],[0.044,-0.033],[0.03,-0.029],[0.03,0.029],[0.044,0.033],[0.044,0.044],[0.02,0.049],[0.02,0.06],[0.012,0.06]],28,XH);
+ col(C.nickel,MAT.CHROME);latheAt(c,Z,[[0,-0.075],[0.012,-0.075],[0.012,0.075],[0,0.075]],10,XH);
+ for(let k=0;k<40;k++){const s=k%2?1:-1,a=k/40*TAU,b=a+0.4*((k>>1)%2?1:-1);
+  cylAB([c[0]+0.04*Math.cos(a),c[1]+0.04*Math.sin(a),s*0.039],[c[0]+0.196*Math.cos(b),c[1]+0.196*Math.sin(b),s*0.007],0.0023,5);}}
+/* deep valanced fender. style: 'stripe' (1932 border pinstripe), 'black' (1933 crown stripes),
+   'crown' (1934 second colour on the crown), 'skirt' (1935–36 second colour on the side skirts).
+   uStripe (tone) is the scheme's second colour. 1934+ fenders are deeper and flared. */
+function fender(c,a0,a1,Rf,W,style,deepOK){const nt=56,deep=!!deepOK&&style==='skirt';
+ const drop=deep?0.55:0.45,edge=deep?0.72:0.78;
+ const rad=s=>Rf+0.03*(1-s*s)+0.01*Math.max(0,1-Math.abs(s)*6)-(Math.abs(s)>edge?(Math.abs(s)-edge)*drop:0);
+ const wid=s=>s*W*(deep?1.04:1);
+ const strip=(s0,s1,mat,colr)=>{const nw=Math.max(2,Math.round((s1-s0)*10));const P=[];
+  for(let i=0;i<=nt;i++){const a=a0+(a1-a0)*i/nt,ca=Math.cos(a),sa=Math.sin(a);const r=[];
+   for(let j=0;j<=nw;j++){const s=lerp(s0,s1,j/nw);r.push([c[0]+rad(s)*ca,c[1]+rad(s)*sa,wid(s)]);}P.push(r);}
+  col(colr,mat);grid(P,false,false);};
+ const line=(s,off,r,colr,mat,i0)=>{const pts=[];for(let i=i0;i<=nt-i0;i++){const a=a0+(a1-a0)*i/nt;const rr=rad(s)+off;pts.push([c[0]+rr*Math.cos(a),c[1]+rr*Math.sin(a),wid(s)+(Math.abs(s)>0.9?Math.sign(s)*0.003:0)]);}col(colr,mat);tube(pts,r,5,false,true);};
+ if(style==='crown'){strip(-1,-0.42,MAT.BODY,C.body);strip(-0.42,0.42,MAT.STRIPE,C.body);strip(0.42,1,MAT.BODY,C.body);
+  for(const s of [-0.42,0.42])line(s,0.0022,0.0018,C.black,MAT.PAINT,2);}
+ else if(style==='skirt'){strip(-1,-0.8,MAT.STRIPE,C.body);strip(-0.8,0.8,MAT.BODY,C.body);strip(0.8,1,MAT.STRIPE,C.body);
+  for(const s of [-0.8,0.8])line(s,0.002,0.0022,C.gold,MAT.PAINT,2);}
+ else{strip(-1,1,MAT.BODY,C.body);
+  if(style==='stripe'){for(const s of [-0.95,0.95]){line(s,-0.006,0.0052,C.body,MAT.STRIPE,2);line(s*0.9,0.0005,0.0015,C.gold,MAT.PAINT,3);}}
+  for(const s of [-0.36,0.36])line(s,0.0022,style==='black'?0.0034:0.0024,C.body,MAT.STRIPE,3);
+  if(style==='black')for(const s of [-0.45,0.45])line(s,0.0022,0.0012,C.gold,MAT.PAINT,4);}}
+/* teardrop saddle tank halves straddling the top tube; returns the section function */
+function tankSec(zc){const x0=0.385,x1=-0.205;
+ return t=>{const x=lerp(x0,x1,t),e=Math.max(Math.pow(Math.max(Math.sin(Math.PI*clamp(t,0,1)),0),0.22),0.02);
+  return {x,y:topTubeY(x)-0.066+0.012*(1-t),z:zc,w:0.07*e+0.0005,h:(0.108+0.008*(1-t))*e,e:2.8};};}
+function onSide(sec,t,k,side,off){const s=sec(t);const zz=s.w*Math.pow(Math.max(1-Math.pow(Math.abs(k),s.e),0),1/s.e);return [s.x,s.y+k*s.h,s.z+side*(zz+off)];}
+/* a painted panel on the tank surface between k=lo(t) and k=hi(t) */
+function tankPanel(sec,side,t0,t1,lo,hi,off,colr,mat){const nt=28,nk=10,P=[];
+ for(let i=0;i<=nt;i++){const t=lerp(t0,t1,i/nt);const r=[];const a=lo(t),b=hi(t);for(let j=0;j<=nk;j++)r.push(onSide(sec,t,lerp(a,b,j/nk),side,off));P.push(r);}
+ col(colr,mat);grid(P,false,false);}
+function tankLine(sec,side,t0,t1,kf,off,r,colr,mat){const pts=[];for(let i=0;i<=30;i++){const t=lerp(t0,t1,i/30);pts.push(onSide(sec,t,kf(t),side,off));}col(colr,mat);tube(pts,r,5,false,true);}
+function tankLoop(sec,side,t0,t1,k0,k1,off,r,colr,mat){const loop=[];
+ for(let i=0;i<=24;i++)loop.push(onSide(sec,lerp(t0,t1,i/24),k1,side,off));for(let i=1;i<=8;i++)loop.push(onSide(sec,t1,lerp(k1,k0,i/8),side,off));
+ for(let i=1;i<=24;i++)loop.push(onSide(sec,lerp(t1,t0,i/24),k0,side,off));for(let i=1;i<8;i++)loop.push(onSide(sec,t0,lerp(k0,k1,i/8),side,off));
+ col(colr,mat);tube(smooth(loop.concat([loop[0]]),2),r,6,true);}
+function tankBody(zc,side){const sec=tankSec(zc);
+ col(C.body,MAT.BODY);loft(44,44,sec);
+ const sc=sec(0.3);col(C.nickel,MAT.CHROME);latheAt([sc.x,sc.y+sc.h-0.006,zc+side*0.012],[0,1,0],[[0,0],[0.022,0],[0.022,0.011],[0.017,0.016],[0,0.017]],20);
+ return sec;}
+function sprocketTeeth(c,r,n,z,sz){for(let i=0;i<n;i++){const a=i/n*TAU;obox([c[0]+r*Math.cos(a),c[1]+r*Math.sin(a),z],[Math.cos(a),Math.sin(a),0],[-Math.sin(a),Math.cos(a),0],0.008,sz,0.007);}}
+function chainLinks(path,step,w,h,t){for(const l of resample(path,step,true))obox(l.p,l.d,[-l.d[1],l.d[0],0],w,h,t);}
+/* forged I-beam leg: two flanges + web, flanges facing sideways (z) */
+function ibeam(a,b,depth,flange,t){const d=norm(sub(b,a)),p=[-d[1],d[0],0],L=len(sub(b,a)),c=lerp3(a,b,0.5);
+ obox(c,d,p,L,depth,t);for(const s of [-1,1])obox(add(c,scl(p,s*depth/2)),d,p,L,t,flange);}
+/* flat emblem polygons placed on the tank side (local x forward, y up, z out of the surface) */
+function emblemAt(side,fn,t,k,s){const sec=tankSec(side*0.062);const pc=onSide(sec,t===undefined?0.45:t,k===undefined?0.0:k,side,0.004);withXF(M4.mul(M4.cols([1,0,0],[0,1,0],[0,0,side],pc),M4.scale(s||1,s||1,1)),fn);}
+const BUILD={
+ frame(){col(C.body,MAT.FRAME);const r=0.0165;
+  tube([H1,H2],0.024,16);
+  tube(smooth([TT0,[0.1,topTubeY(0.1)-0.004,0],add(S1,[0.008,-0.004,0])],4),r,12);
+  // single front down tube, bowed forward to clear the horizontal generator, splitting into a cradle
+  tube(smooth([add(H2,[-0.006,0.012,0]),[0.43,0.6,0],[0.375,0.42,0],[0.325,0.27,0],[0.295,0.14,0]],6),r*1.08,12);
+  for(const s of [-1,1]){
+   tube(smooth([[0.295,0.14,0],[0.25,0.112,s*0.045],[0.12,0.104,s*0.05],[-0.15,0.104,s*0.05],[-0.25,0.14,s*0.02]],6),r*0.92,12);
+   tube(smooth([[-0.218,0.69,0],[-0.27,0.64,s*0.05],[R[0]+0.02,R[1]+0.03,s*0.088]],5),r*0.8,10);
+   tube(smooth([[-0.25,0.165,0],[-0.31,0.18,s*0.06],[R[0]+0.01,R[1]-0.004,s*0.088]],5),r*0.8,10);
+   obox([R[0]+0.005,R[1]+0.012,s*0.09],[1,0,0],[0,1,0],0.07,0.05,0.012);}
+  tube([S1,S2],0.02,14);
+  for(const p of [H1,H2,S1,[-0.25,0.165,0]])latheAt(add(p,[0,-0.024,0]),[0,1,0],[[0,0],[0.026,0.005],[0.028,0.024],[0.026,0.044],[0,0.048]],14);
+  obox([0.205,0.125,0],[1,0,0],[0,1,0],0.055,0.035,0.12);obox([-0.10,0.125,0],[1,0,0],[0,1,0],0.055,0.035,0.12);},
+ fork(){for(const z of [-0.07,0.07]){col(C.body,MAT.FRAME);
+   ibeam([0.468,0.80,z],[0.683,0.335,z],0.03,0.024,0.006);   // rigid legs
+   ibeam([0.535,0.79,z],[0.785,0.325,z],0.025,0.021,0.0055); // sprung legs
+   col(C.park,MAT.ALU);withXF(M4.trans(0,0,z),()=>extrude([[0.672,0.358],[0.80,0.346],[0.806,0.302],[0.715,0.266],[0.668,0.306]],-0.007,0.007));
+   col(C.nickel,MAT.CHROME);for(const p of [[0.683,0.335],[0.785,0.325]])cylAB([p[0],p[1],z-0.015],[p[0],p[1],z+0.015],0.0095,10);}
+  col(C.body,MAT.FRAME);cylAB([0.535,0.79,-0.085],[0.535,0.79,0.085],0.011,10);
+  obox([0.47,0.80,0],[1,-0.2,0],[0.2,1,0],0.07,0.022,0.17);obox([0.43,0.885,0],[1,-0.2,0],[0.2,1,0],0.13,0.024,0.12);
+  for(const z of [-0.034,0.034]){col(C.park,MAT.ALU);tube([[0.535,0.795,z],[0.47,0.905,z]],0.0055,8);
+   helix([0.534,0.80,z],[0.515,0.835,z],0.016,4,0.0028);helix([0.51,0.845,z],[0.474,0.9,z],0.016,6,0.003);
+   col(C.nickel,MAT.CHROME);latheAt([0.47,0.902,z],[-0.5,0.87,0],[[0,0],[0.011,0],[0.011,0.011],[0,0.013]],12);}},
+ toolbox(){const o=[0.60,0.775,0];col(C.body,MAT.FRAME);
+  obox(o,[1,-0.12,0],[0.12,1,0],0.066,0.074,0.17);obox(add(o,[0,0.04,0]),[1,-0.12,0],[0.12,1,0],0.072,0.008,0.176);
+  col(C.nickel,MAT.CHROME);for(const s of [-1,1])latheAt(add(o,[0.012,0.012,s*0.0875]),[0,0,s],[[0,0],[0.007,0],[0.007,0.004],[0,0.005]],10,XH);
+  // bar-and-shield transfer on each side
+  for(const s of [-1,1]){const c=add(o,[-0.004,-0.004,s*0.0858]);col(C.cream,MAT.PAINT);obox(c,[1,0,0],[0,1,0],0.034,0.03,0.002);
+   col([0.85,0.42,0.08],MAT.PAINT);obox(add(c,[0,0,s*0.0012]),[1,0,0],[0,1,0],0.03,0.026,0.002);
+   col(C.black,MAT.PAINT);obox(add(c,[0,0.001,s*0.0024]),[1,0,0],[0,1,0],0.04,0.008,0.002);}},
+ headlamp(){const o=[0.578,0.925,0];
+  col(C.black,MAT.PAINT);latheAt(o,[1,0,0],[[0,-0.09],[0.036,-0.085],[0.06,-0.062],[0.074,-0.032],[0.079,0],[0.079,0.01]],32);
+  col(C.nickel,MAT.CHROME);latheAt(o,[1,0,0],[[0.079,0.01],[0.085,0.013],[0.085,0.023],[0.072,0.027]],32);
+  col(C.lens,MAT.GLOW);latheAt(o,[1,0,0],[[0.072,0.026],[0.048,0.034],[0,0.037]],32);
+  col(C.park,MAT.ALU);obox([0.49,0.915,0],[1,0.1,0],[0,1,0],0.05,0.018,0.045);
+  col(C.black,MAT.PAINT);latheAt(add(o,[-0.01,0.078,0]),[0,1,0],[[0,0],[0.008,0],[0.008,0.018],[0,0.02]],10);},
+ horn(){const o=[0.64,0.768,0];col(C.black,MAT.PAINT);
+  latheAt(o,[1,0,0],[[0,-0.02],[0.03,-0.02],[0.034,-0.005],[0.034,0.012],[0.044,0.022],[0.046,0.026]],28);
+  const f=add(o,[0.027,0,0]);col(C.nickel,MAT.CHROME);disc(f,[1,0,0],0.046,0.004,40);
+  col(C.black,MAT.PAINT);for(let i=0;i<16;i++){const a=i/16*TAU,d=[0,Math.cos(a),Math.sin(a)];obox(add(f,add(scl(d,0.026),[0.0045,0,0])),d,[1,0,0],0.034,0.0022,0.0042);}
+  col(C.nickel,MAT.CHROME);latheAt(add(f,[0.004,0,0]),[1,0,0],[[0,0],[0.012,0],[0.01,0.006],[0,0.008]],20);},
+ bars(){const half=s=>[[0.06,0.915,s*0.37],[0.12,0.918,s*0.33],[0.25,0.955,s*0.25],[0.38,0.95,s*0.1],[0.43,0.925,0]];
+  col(C.black,MAT.PAINT);tube(smooth(half(-1).concat(half(1).reverse().slice(1)),6),0.011,10,false,true);
+  col(C.rubber,MAT.MATTE);for(const s of [-1,1])tube([[0.063,0.915,s*0.367],[0.122,0.918,s*0.327]],0.016,12);
+  col(C.nickel,MAT.CHROME);for(const s of [-1,1])cylAB([0.123,0.918,s*0.326],[0.131,0.92,s*0.321],0.0175,12);},
+ gen(){const o=[0.207,0.238,0];
+  // horizontal generator ahead of the crankcase, axis across the bike, gear-driven from the right (photos)
+  col(C.black,MAT.PAINT);latheAt(add(o,[0,0,0.075]),[0,0,-1],[[0,0],[0.038,0],[0.042,0.006],[0.042,0.165],[0.044,0.17]],32,XH);
+  col(C.nickel,MAT.CHROME);latheAt(add(o,[0,0,-0.095]),[0,0,-1],[[0.044,0],[0.044,0.006],[0.038,0.018],[0.022,0.027],[0,0.03]],28,XH);
+  latheAt(add(o,[0,0,-0.02]),[0,0,-1],[[0.0435,0],[0.0435,0.018]],28,XH);
+  col(C.alu,MAT.ALU);obox(add(o,[-0.035,-0.005,0.07]),[1,0,0],[0,1,0],0.07,0.06,0.04);
+  col(C.black,MAT.PAINT);obox(add(o,[0,0.05,0.0]),[1,0,0],[0,1,0],0.05,0.022,0.06);},
+ exhaust(k){col(C.black,MAT.PAINT);
+  tube(smooth([map([0.17,0.47,0.1]),map([0.23,0.44,0.115]),map([0.275,0.36,0.125]),[0.24,0.19,0.122],[0.17,0.125,0.128],[-0.05,0.118,0.134],[-0.2,0.128,0.14]],6),0.016,12);
+  tube(smooth([map([-0.105,0.47,0.1]),map([-0.145,0.42,0.115]),map([-0.155,0.3,0.128]),[-0.15,0.18,0.135],[-0.2,0.13,0.14]],6),0.015,12);
+  const a=[-0.21,0.13,0.14];
+  const muff=(b,L)=>latheAt(a,sub(b,a),[[0,0],[0.018,0],[0.034,0.03],[0.037,0.06],[0.037,L-0.03],[0.032,L],[0.016,L+0.015],[0.016,L+0.03],[0,L+0.03]],24);
+  if(k==='low'){const b=[-1.0,0.2,0.14];muff(b,0.76);}
+  else if(k==='hiflo'){const b=[-0.62,0.168,0.14];muff(b,0.38);
+   tube(smooth([[-0.60,0.168,0.14],[-0.78,0.175,0.142],[-0.95,0.19,0.145],[-1.04,0.27,0.146],[-1.08,0.40,0.146]],6),0.017,12,false,true);}
+  else{const b=[-0.70,0.18,0.14];muff(b,0.44);
+   // fishtail: flat fan on the end of the muffler
+   withXF(M4.trans(0,0,0.14),()=>extrude([[-0.66,0.198],[-0.83,0.228],[-0.845,0.152],[-0.66,0.172]],-0.008,0.008));}
+  col(C.park,MAT.ALU);for(const x of [-0.32,-0.55]){const t=(x-a[0])/(-0.7-a[0]),y=lerp(a[1],0.185,t);latheAt([x,y,0.14],[ -1,0.1,0],[[0.04,-0.006],[0.04,0.006]],20);}},
+ final(){const c1=[TR[0],TR[1]],c2=[R[0],R[1]],z=0.077; // right-side final drive, inboard of the kick starter
+  col(C.nickel,MAT.CHROME);disc([c1[0],c1[1],z-0.003],Z,0.034,0.006,24);disc([c2[0],c2[1],z-0.003],Z,0.088,0.006,48);
+  sprocketTeeth(c1,0.037,17,z,0.006);sprocketTeeth(c2,0.092,41,z,0.006);
+  col(C.chain,MAT.CHROME);chainLinks(beltPath(c1,0.042,c2,0.097,0.004,z),0.0158,0.0148,0.009,0.014);
+  const d3=sub([c2[0],c2[1],0],[c1[0],c1[1],0]),d=norm(d3),beta=Math.asin((0.042-0.097)/len(d3));
+  const nU=[Math.sin(beta)*d[0]-Math.cos(beta)*d[1],Math.sin(beta)*d[1]+Math.cos(beta)*d[0],0];
+  const pa=[c1[0]+0.068*nU[0],c1[1]+0.068*nU[1],z],pb=[c2[0]+0.118*nU[0]-0.04*d[0],c2[1]+0.118*nU[1]-0.04*d[1],z];
+  col(C.body,MAT.FRAME);obox(lerp3(pa,pb,0.5),sub(pb,pa),nU,len(sub(pb,pa)),0.004,0.042);obox(add(lerp3(pa,pb,0.5),[0,0,0.021]),sub(pb,pa),nU,len(sub(pb,pa)),0.026,0.003);},
+ saddle(k){col(k==='tan'?C.leather:C.seatblack,MAT.MATTE);loft(36,36,t=>{const x=lerp(-0.075,-0.44,t),e=Math.pow(Math.max(Math.sin(Math.PI*clamp(t*0.92+0.04,0,1)),0),0.3);
+   return {x,y:0.772+0.022*t*t,z:0,w:(0.032+0.115*Math.pow(clamp((t-0.1)/0.7,0,1),0.9))*Math.max(e,0.03),h:(0.022+0.012*t)*Math.max(e,0.05),e:3};});
+  col(C.black,MAT.PAINT);tube(smooth([[-0.09,0.752,0],[-0.12,0.76,0],[-0.3,0.758,0],[-0.4,0.766,0]],5),0.007,8);
+  for(const s of [-1,1]){helix([-0.40,0.64,s*0.068],[-0.40,0.768,s*0.068],0.016,7,0.0032);tube([[-0.26,0.64,0],[-0.40,0.64,s*0.068]],0.006,8);}
+  col(C.nickel,MAT.CHROME);cylAB([-0.22,0.69,0],[-0.22,0.758,0],0.011,12);latheAt([-0.22,0.71,0],[0,1,0],[[0.022,0],[0.022,0.013],[0.011,0.018]],16);},
+ boards(){for(const s of [-1,1]){col(C.park,MAT.ALU);obox([0.17,0.18,s*0.205],[1,0,0],[0,1,0],0.29,0.012,0.11);
+   col(C.rubber,MAT.MATTE);for(let i=0;i<6;i++)obox([0.17,0.189,s*(0.165+i*0.016)],[1,0,0],[0,1,0],0.27,0.007,0.009);
+   col(C.park,MAT.ALU);for(const x of [0.07,0.28])tube([[x,0.115,s*0.055],[x,0.17,s*0.155]],0.007,8);}},
+ fwheel(){wheel(F);},
+ rwheel(){wheel(R);},
+ fbrake(){// front drum brake on the LEFT (photos)
+  col(C.black,MAT.PAINT);latheAt(F,[0,0,-1],[[0.03,0.046],[0.084,0.046],[0.09,0.05],[0.09,0.068],[0.084,0.074],[0.03,0.074]],40,XH);
+  col(C.park,MAT.ALU);tube([[F[0]-0.02,F[1]+0.06,-0.076],[F[0]-0.06,F[1]+0.12,-0.08]],0.007,8);
+  col(C.nickel,MAT.CHROME);disc([F[0],F[1],-0.074],[0,0,-1],0.02,0.006,14);latheAt([F[0]+0.055,F[1],-0.074],[0,0,-1],[[0,0],[0.007,0],[0.007,0.01],[0,0.011]],8,XH);},
+ rbrake(k){// rear brake drum on the right, inboard of the sprocket
+  col(C.black,MAT.PAINT);latheAt(R,Z,[[0.03,0.046],[0.09,0.046],[0.094,0.05],[0.094,0.07],[0.03,0.07]],40,XH);
+  if(k==='band'){ // external contracting band clamped round the outside of the drum
+   col(C.park,MAT.ALU);latheAt(R,Z,[[0.097,0.048],[0.101,0.048],[0.101,0.068],[0.097,0.068]],40,XH);
+   obox([R[0]+0.105,R[1]+0.03,0.058],[0.3,1,0],[1,0,0],0.05,0.026,0.024);obox([R[0]+0.1,R[1]-0.035,0.058],[-0.3,1,0],[1,0,0],0.04,0.022,0.024);
+   col(C.nickel,MAT.CHROME);cylAB([R[0]+0.118,R[1]+0.055,0.058],[R[0]+0.118,R[1]-0.06,0.058],0.004,8);}
+  else{ // internal expanding shoes behind a backing plate with an operating arm
+   col(C.park,MAT.ALU);latheAt(R,Z,[[0.03,0.07],[0.088,0.07],[0.088,0.074],[0.03,0.076]],40,XH);
+   obox([R[0]+0.06,R[1]-0.055,0.078],[0.5,-1,0],[0,0,1],0.07,0.012,0.008);}
+  col(C.park,MAT.ALU);obox([R[0]+0.11,R[1]+0.012,0.064],[1,0.1,0],[0,1,0],0.085,0.024,0.008);
+  tube(smooth([[R[0]+0.03,R[1]-0.075,0.076],[-0.42,0.17,0.085],[0.0,0.11,0.09],[0.22,0.15,0.1]],6),0.0045,6);},
+ tank(){const sec=tankBody(0.062,1);
+  // instrument dash on top, between the tank halves
+  const x=0.12,y=topTubeY(x)+0.055;col(C.black,MAT.PAINT);obox([x,y,0],[1,-0.15,0],[0.15,1,0],0.2,0.012,0.06);
+  col(C.nickel,MAT.CHROME);for(const dx of [-0.05,0.0,0.05])latheAt([x+dx,y+0.006-dx*0.15,0],[0,1,0],[[0,0],[0.01,0],[0.01,0.006],[0,0.008]],12);},
+ oiltank(){const sec=tankBody(-0.062,-1);const s=sec(0.8);col(C.nickel,MAT.CHROME);latheAt([s.x,s.y+s.h-0.01,-0.04],[0,1,0],[[0.012,0],[0.012,0.046],[0.007,0.05],[0.007,0.066]],14);
+  col(C.black,MAT.PAINT);latheAt([s.x,s.y+s.h+0.056,-0.04],[0,1,0],[[0,0],[0.013,0.002],[0.013,0.011],[0,0.015]],14);},
+ cyl(){ENG(()=>{for(const [B,A] of [[OB1,A1],[OB2,A2]]){const M=basisY(B,A,Z);
+  const p=[[0,-0.01],[0.066,-0.01],[0.066,0.012],[0.054,0.014]];let h=0.022;for(let i=0;i<10;i++){p.push([0.054,h],[0.085,h+0.002],[0.085,h+0.007],[0.054,h+0.009]);h+=0.0165;}p.push([0.054,0.19],[0,0.19]);
+  col(C.iron,MAT.PAINT);withXF(M,()=>lathe(p,32));
+  const hp=[[0,0.186],[0.074,0.186]];let g=0.19;for(let i=0;i<6;i++){hp.push([0.074,g],[0.094,g+0.002],[0.094,g+0.0065],[0.074,g+0.0085]);g+=0.0125;}hp.push([0.064,g+0.004],[0,g+0.006]);
+  col(C.iron,MAT.PAINT);withXF(M,()=>withXF(M4.mul(M4.trans(0.026,0,0),M4.scale(1.36,1,1)),()=>lathe(hp,32)));
+  for(const sx of [-0.03,0.03])for(const sz of [-0.05,0.05]){col(C.nickel,MAT.CHROME);withXF(M,()=>latheAt([0.026+sx*1.6,g+0.004,sz],[0,1,0],[[0,0],[0.0055,0],[0.0055,0.012],[0,0.013]],8));}
+  const tp=add(B,scl(A,0.27));col(C.nickel,MAT.CHROME);latheAt(tp,A,[[0,0],[0.011,0],[0.011,0.012],[0.007,0.014]],14);
+  col(C.porcelain,MAT.PAINT);latheAt(add(tp,scl(A,0.014)),A,[[0.007,0],[0.0065,0.03],[0.003,0.036],[0,0.037]],14);}});},
+ crank(){ENG(()=>{col(C.alu,MAT.ALU);latheAt(OCR,Z,[[0,-0.086],[0.12,-0.082],[0.138,-0.07],[0.145,-0.042],[0.145,0.042],[0.138,0.07],[0.12,0.082],[0,0.086]],44,XH);
+  for(const [B,A] of [[OB1,A1],[OB2,A2]])latheAt(sub(B,scl(A,0.03)),A,[[0,0],[0.076,0],[0.076,0.022],[0.066,0.03],[0,0.03]],28,Z);
+  obox([0.13,0.16,0],[1,0,0],[0,1,0],0.06,0.05,0.12);obox([-0.06,0.16,0],[1,0,0],[0,1,0],0.06,0.05,0.12);
+  // stamped engine-number pad on the left case
+  const pad=[0.04,0.448,-0.055];col([0.66,0.65,0.62],MAT.ALU);obox(pad,[1,0,0],[0,1,0],0.07,0.008,0.028);
+  col(C.iron,MAT.MATTE);for(let i=0;i<7;i++)obox(add(pad,[-0.027+i*0.009,0.0045,0]),[1,0,0],[0,1,0],0.005,0.0012,0.012);});},
+ valves(){ENG(()=>{const VC=[];for(const [B,A] of [[OB1,A1],[OB2,A2]])for(const dx of [-0.026,0.026])VC.push([add(B,[dx,-0.075,0.1]),A]);
+  for(const [p,A] of VC){col(C.nickel,MAT.CHROME);latheAt(p,A,[[0,0],[0.012,0],[0.012,0.05],[0.0145,0.053],[0.0145,0.1],[0.009,0.105],[0,0.106]],16);}
+  // cam gear case cover (right side)
+  col(C.alu,MAT.ALU);extrude(beltPath([0.06,0.29],0.075,[0.24,0.275],0.05,0.012,0).map(p=>[p[0],p[1]]),0.082,0.108);
+  col(C.nickel,MAT.CHROME);for(const p of [[0.0,0.27],[0.12,0.225],[0.26,0.24],[0.17,0.335],[0.03,0.345]])cylAB([p[0],p[1],0.108],[p[0],p[1],0.112],0.004,6);
+  col(C.iron,MAT.PAINT);for(const x of [0.03,0.17])obox([x,0.378,0.1],[1,0,0],[0,1,0],0.1,0.03,0.034);});},
+ oilpump(){ENG(()=>{const o=[-0.075,0.255,0.1];col(C.black,MAT.PAINT);latheAt(o,Z,[[0,0],[0.032,0],[0.032,0.03],[0.024,0.036],[0,0.037]],22,XH);
+  col(C.nickel,MAT.CHROME);latheAt(add(o,[0,0,0.037]),Z,[[0,0],[0.01,0],[0.01,0.008],[0,0.009]],12,XH);
+  for(let i=0;i<4;i++){const a=i/4*TAU+0.4;cylAB(add(o,[0.026*Math.cos(a),0.026*Math.sin(a),0.03]),add(o,[0.026*Math.cos(a),0.026*Math.sin(a),0.035]),0.0035,6);}
+  col([0.55,0.54,0.5],MAT.CHROME);tube(smooth([[-0.075,0.28,0.12],[-0.10,0.40,0.12],[-0.09,0.62,0.09],[-0.06,0.80,-0.02],[-0.04,0.86,-0.07]],6),0.0045,6);
+  tube(smooth([[-0.05,0.25,0.125],[0.0,0.235,0.12],[0.05,0.26,0.11]],4),0.004,6);});},
+ carb(){ENG(()=>{col(C.park,MAT.ALU);tube(smooth([[0.09,0.54,0.058],[0.06,0.50,0.09],[0.045,0.49,0.11]],4),0.015,12);tube(smooth([[-0.01,0.54,0.058],[0.03,0.50,0.09],[0.045,0.49,0.11]],4),0.015,12);
+  col(C.bronze,MAT.CHROME);latheAt([0.045,0.49,0.105],Z,[[0.018,0],[0.028,0.005],[0.028,0.065],[0.022,0.07]],20,XH);
+  latheAt([0.045,0.40,0.15],[0,1,0],[[0,0],[0.009,-0.004],[0.024,0],[0.026,0.006],[0.026,0.062],[0.018,0.068],[0,0.07]],20);
+  col(C.brass,MAT.CHROME);cylAB([0.045,0.515,0.125],[0.045,0.555,0.125],0.0042,8);cylAB([0.07,0.49,0.135],[0.10,0.49,0.135],0.003,6);cylAB([0.02,0.47,0.14],[-0.005,0.455,0.14],0.003,6);
+  col(C.bronze,MAT.CHROME);latheAt([0.045,0.49,0.17],Z,[[0.022,0],[0.03,0.004],[0.03,0.02],[0.042,0.032],[0.044,0.036]],24,XH);});},
+ ign(){ENG(()=>{const o=[-0.19,0.66,0.046];col(C.black,MAT.PAINT);latheAt(o,[0,1,0],[[0,0],[0.026,0],[0.028,0.005],[0.028,0.1],[0.022,0.11],[0,0.112]],20);
+  col(C.nickel,MAT.CHROME);for(const y of [0.68,0.745])tube(circlePts([-0.19,y,0.046],0.03,24,0,TAU,'xz'),0.003,6,true);
+  col(C.fabric,MAT.MATTE);const tf=add(OB1,scl(A1,0.31)),tr=add(OB2,scl(A2,0.31));
+  tube(smooth([[-0.19,0.77,0.052],[-0.1,0.78,0.062],[0.05,0.76,0.045],[tf[0]-0.02,tf[1]+0.01,0.01],tf],6),0.0044,6);
+  tube(smooth([[-0.184,0.77,0.036],[-0.15,0.75,0.022],[tr[0]-0.01,tr[1]+0.01,0.005],tr],6),0.0044,6);
+  col(C.nickel,MAT.CHROME);latheAt([0.12,0.33,0.108],Z,[[0,0],[0.026,0],[0.026,0.024],[0.019,0.03],[0,0.031]],20,XH);});},
+ battery(){ENG(()=>{col(C.black,MAT.PAINT);obox([-0.34,0.58,0],[1,0,0],[0,1,0],0.13,0.125,0.105);obox([-0.34,0.65,0],[1,0,0],[0,1,0],0.138,0.014,0.113);
+  col(C.nickel,MAT.CHROME);for(const s of [-1,1])latheAt([-0.34+s*0.042,0.657,0],[0,1,0],[[0,0],[0.008,0],[0.008,0.01],[0,0.012]],10);});},
+ gear(){ENG(()=>{col(C.alu,MAT.ALU);latheAt(OTR,Z,[[0,-0.068],[0.08,-0.068],[0.088,-0.06],[0.088,0.06],[0.08,0.068],[0,0.068]],36,XH);
+  obox([-0.355,0.41,0],[1,0,0],[0,1,0],0.155,0.06,0.118);obox([-0.28,0.305,0],[1,0,0],[0,1,0],0.05,0.06,0.112);
+  latheAt(add(OTR,[0,0,0.068]),Z,[[0.07,0],[0.07,0.018],[0.06,0.024],[0,0.025]],32,XH);
+  col(C.nickel,MAT.CHROME);disc(add(OTR,[0.03,0.03,0.092]),Z,0.022,0.004,18);
+  for(let i=0;i<8;i++){const a=i/8*TAU;cylAB(add(OTR,[0.064*Math.cos(a),0.064*Math.sin(a),0.091]),add(OTR,[0.064*Math.cos(a),0.064*Math.sin(a),0.096]),0.004,6);}});},
+ mountplate(){ENG(()=>{col(C.park,MAT.ALU);obox([-0.35,0.238,0],[1,0,0],[0,1,0],0.2,0.01,0.15);
+  col(C.brass,MAT.ALU);for(const s of [-1,1])obox([-0.35+s*0.085,0.231,0.0],[1,0,0],[0,1,0],0.03,0.004,0.15);
+  col(C.nickel,MAT.CHROME);for(const x of [-0.41,-0.29])for(const z of [-0.05,0.05]){cylAB([x,0.225,z],[x,0.262,z],0.0055,8);latheAt([x,0.222,z],[0,1,0],[[0,0],[0.011,0],[0.011,0.007],[0,0.007]],6);}
+  col(C.park,MAT.ALU);for(const s of [-1,1])obox([-0.35,0.2,s*0.062],[1,0,0],[0,1,0],0.22,0.05,0.012);});},
+ clutch(){ENG(()=>{const o=add(OTR,[0,0,-0.1]);col(C.nickel,MAT.CHROME);latheAt(o,[0,0,-1],[[0.02,0],[0.08,0],[0.082,0.004],[0.082,0.016],[0.074,0.02],[0.03,0.02],[0.03,0.028],[0,0.03]],40,XH);
+  col(C.park,MAT.ALU);for(let i=0;i<10;i++){const a=i/10*TAU;latheAt(add(o,[0.056*Math.cos(a),0.056*Math.sin(a),-0.02]),[0,0,-1],[[0,0],[0.007,0],[0.007,0.012],[0,0.012]],8,XH);}
+  for(let i=0;i<5;i++){col(i%2?C.fabric:C.alu,i%2?MAT.MATTE:MAT.ALU);latheAt(add(o,[0,0,0.008+i*0.004]),[0,0,-1],[[0.035,0],[0.084,0],[0.084,0.0035],[0.035,0.0035]],40,XH);}
+  col(C.nickel,MAT.CHROME);tube(smooth([[0.28,0.255,-0.175],[0.34,0.23,-0.175],[0.41,0.26,-0.175]],4),0.009,8);
+  col(C.rubber,MAT.MATTE);obox([0.415,0.262,-0.175],[1,0.3,0],[0,1,0],0.04,0.01,0.035);
+  col(C.nickel,MAT.CHROME);cylAB([0.34,0.2,-0.16],[0.34,0.235,-0.175],0.007,8);
+  tube(smooth([[0.34,0.205,-0.155],[0.1,0.14,-0.135],[-0.22,0.2,-0.135],[-0.32,0.38,-0.145]],6),0.004,6);});},
+ shifter(){ENG(()=>{col(C.nickel,MAT.CHROME);tube(smooth([[0.36,0.84,-0.15],[0.345,0.95,-0.158],[0.315,1.07,-0.166]],4),0.0078,10);
+  obox([0.345,0.93,-0.146],[0.1,1,0],[1,0,0],0.13,0.04,0.006);
+  col(C.black,MAT.PAINT);latheAt([0.312,1.07,-0.166],[-0.2,1,0],[[0,0],[0.015,0.004],[0.019,0.016],[0.015,0.028],[0,0.032]],16);
+  col(C.park,MAT.ALU);tube(smooth([[0.36,0.84,-0.15],[0.2,0.76,-0.11],[-0.08,0.6,-0.09],[-0.31,0.44,-0.064]],6),0.0058,8);
+  cylAB([0.36,0.84,-0.168],[0.36,0.84,-0.128],0.01,10);});},
+ kick(){ENG(()=>{col(C.park,MAT.ALU);cylAB(add(OTR,[0,0,0.094]),add(OTR,[0,0,0.12]),0.015,12);
+  tube(smooth([add(OTR,[0,0,0.112]),[-0.31,0.275,0.12],[-0.25,0.205,0.123]],4),0.011,10);
+  col(C.nickel,MAT.CHROME);cylAB([-0.25,0.205,0.117],[-0.25,0.205,0.145],0.008,8);
+  col(C.rubber,MAT.MATTE);cylAB([-0.25,0.205,0.145],[-0.25,0.205,0.22],0.014,12);});},
+ primary(){ENG(()=>{const c1=[OCR[0],OCR[1]],c2=[OTR[0],OTR[1]],z=-0.106;
+  col(C.park,MAT.ALU);disc([c1[0],c1[1],z-0.01],Z,0.05,0.02,24);disc([c2[0],c2[1],z-0.01],Z,0.092,0.02,40);
+  for(const dz of [-0.0065,0.0065]){sprocketTeeth(c1,0.052,26,z+dz,0.005);sprocketTeeth(c2,0.096,52,z+dz,0.005);}
+  col(C.chain,MAT.CHROME);for(const dz of [-0.0065,0.0065])chainLinks(beltPath(c1,0.058,c2,0.102,0.004,z+dz),0.0127,0.0118,0.0075,0.011);
+  col(C.nickel,MAT.CHROME);disc([c1[0],c1[1],z-0.014],Z,0.014,0.026,12);});},
+ pcover(){ENG(()=>{const hull=beltPath([OCR[0],OCR[1]],0.088,[OTR[0],OTR[1]],0.13,0.01,0).map(p=>[p[0],p[1]]);
+  col(C.body,MAT.FRAME);extrude(hull,-0.164,-0.154);tube(hull.map(p=>[p[0],p[1],-0.153]),0.006,6,true);
+  extrude(beltPath([OCR[0],OCR[1]],0.084,[OTR[0],OTR[1]],0.126,0.01,0).map(p=>[p[0],p[1]]),-0.154,-0.126);
+  disc([OCR[0],OCR[1],-0.164],[0,0,-1],0.036,0.008,24);disc([OTR[0],OTR[1],-0.164],[0,0,-1],0.052,0.008,28);
+  col(C.nickel,MAT.CHROME);for(const [c,r] of [[OCR,0.036],[OTR,0.052]])for(let i=0;i<6;i++){const a=i/6*TAU;cylAB([c[0]+r*0.8*Math.cos(a),c[1]+r*0.8*Math.sin(a),-0.172],[c[0]+r*0.8*Math.cos(a),c[1]+r*0.8*Math.sin(a),-0.176],0.004,6);}
+  col(C.gold,MAT.PAINT);tube(beltPath([OCR[0],OCR[1]],0.072,[OTR[0],OTR[1]],0.115,0.01,-0.1645),0.0016,4,true);});},
+ graphics(k,side){const sec=tankSec(side*0.062);const G=C.gold;
+  if(k==='script'){ // 1932: vermilion panel outline edged gold, red block lettering in two lines
+   tankLoop(sec,side,0.08,0.9,-0.64,0.62,0.003,0.0042,C.body,MAT.STRIPE);
+   tankLoop(sec,side,0.115,0.865,-0.52,0.5,0.0032,0.0014,G,MAT.PAINT);
+   lettering(side,'HARLEY',0.42,0.24,C.red,G,0.021,0.028);lettering(side,'DAVIDSON',0.52,-0.26,C.red,G,0.021,0.028);}
+  else if(k==='eagle'){ // 1933: red lower panel, gold Art-Deco eagle at the front, gold script
+   const hi=t=>-0.08+0.62*Math.pow(1-t,2.2);
+   tankPanel(sec,side,0.05,0.95,t=>-0.8,hi,0.0018,C.body,MAT.STRIPE);
+   tankLine(sec,side,0.06,0.94,hi,0.0026,0.0016,G,MAT.PAINT);tankLine(sec,side,0.06,0.94,t=>-0.8,0.0026,0.0014,G,MAT.PAINT);
+   emblemAt(side,()=>{col(G,MAT.CHROME);
+    extrude([[0.07,0.004],[0.03,0.016],[-0.03,0.014],[-0.075,0.004],[-0.07,-0.004],[0.0,-0.008],[0.05,-0.004]],0,0.0016);
+    extrude([[0.022,0.012],[-0.05,0.05],[-0.07,0.046],[-0.028,0.012]],0,0.0018);
+    extrude([[0.008,0.013],[-0.07,0.032],[-0.085,0.026],[-0.035,0.01]],0,0.0014);
+    col(C.body,MAT.STRIPE);extrude([[0.08,0.003],[0.066,0.008],[0.064,-0.002]],0,0.0022);},0.26,0.34);
+   lettering(side,'HARLEY-DAVIDSON',0.55,-0.45,G,G,0.0105,0.016);}
+  else if(k==='d34'){ // 1934: second colour along the top and bottom, flying diamond with speed lines
+   tankPanel(sec,side,0.03,0.97,t=>0.5,t=>0.985,0.0018,C.body,MAT.STRIPE);
+   tankPanel(sec,side,0.08,0.92,t=>-0.9,t=>-0.78,0.0018,C.body,MAT.STRIPE);
+   tankLine(sec,side,0.04,0.96,t=>0.5,0.0026,0.0016,C.black,MAT.PAINT);
+   emblemAt(side,()=>diamond(C.yellow,C.red,C.red,C.yellow),0.4,0.06);}
+  else if(k==='d35'){ // 1935: second colour on the front of the tank, diamond astride the edge
+   const edge=kk=>0.27+0.12*(kk+1)/2;
+   tankPanelK(sec,side,-0.92,0.97,kk=>0.03,edge,0.0018,C.body,MAT.STRIPE);
+   const pts=[];for(let i=0;i<=20;i++){const kk=lerp(-0.9,0.95,i/20);pts.push(onSide(sec,edge(kk),kk,side,0.0026));}col(G,MAT.PAINT);tube(pts,0.0016,5,false,true);
+   emblemAt(side,()=>diamond(G,C.red,C.red,G),0.42,0.04);}
+  else{ // 1936: diagonal band in the second colour, round badge with gold speed lines
+   const mid=kk=>0.36-0.16*kk;
+   tankPanelK(sec,side,-0.92,0.97,kk=>mid(kk)-0.05,kk=>mid(kk)+0.05,0.0018,C.body,MAT.STRIPE);
+   tankPanel(sec,side,0.1,0.9,t=>-0.9,t=>-0.84,0.0018,C.body,MAT.STRIPE);
+   emblemAt(side,()=>{col(C.white,MAT.PAINT);disc([0,0,0.0008],[0,0,1],0.022,0.0012,28);col(C.red,MAT.PAINT);
+    latheAt([0,0,0.0014],[0,0,1],[[0.022,0],[0.016,0],[0.016,0.0012],[0.022,0.0012]],28);disc([0,0,0.0014],[0,0,1],0.008,0.0012,20);
+    col(G,MAT.CHROME);for(let i=0;i<3;i++)box(-0.06-i*0.004,0.01-i*0.01,0.0012,0.07-i*0.012,0.0028,0.0012);},0.22,0.45);}},
+ ffender(k){fender(F,0.14,2.98,0.345,0.07,k);col(C.body,MAT.FRAME);for(const s of [-1,1]){tube([[F[0]+0.345*Math.cos(0.55),F[1]+0.345*Math.sin(0.55),s*0.071],[F[0]+0.02,F[1]+0.01,s*0.079]],0.005,6);
+   tube([[F[0]+0.345*Math.cos(2.35),F[1]+0.345*Math.sin(2.35),s*0.071],[F[0]-0.02,F[1]+0.01,s*0.079]],0.005,6);}},
+ rfender(k){fender(R,0.62,3.32,0.345,0.077,k,true);col(C.body,MAT.FRAME);
+  for(const s of [-1,1]){tube([[R[0]+0.345*Math.cos(2.9),R[1]+0.345*Math.sin(2.9),s*0.078],[R[0]-0.01,R[1]+0.01,s*0.092]],0.005,6);tube([[R[0]+0.345*Math.cos(1.2),R[1]+0.345*Math.sin(1.2),s*0.078],[-0.42,0.48,s*0.08]],0.005,6);
+   // hinged rear stand, folded up behind the axle
+   col(C.black,MAT.PAINT);tube([[R[0],R[1],s*0.1],[R[0]-0.29,R[1]+0.06,s*0.1]],0.007,8);col(C.body,MAT.FRAME);}
+  col(C.black,MAT.PAINT);tube([[R[0]-0.29,R[1]+0.06,-0.1],[R[0]-0.29,R[1]+0.06,0.1]],0.007,8);},
+ tail(k){const a=2.45,o=[R[0]+0.39*Math.cos(a),R[1]+0.39*Math.sin(a)+0.012,0];col(C.black,MAT.PAINT);obox(add(o,[0.01,-0.022,0]),[1,0,0],[0,1,0],0.034,0.02,0.012);
+  if(k==='airflow'){ // streamlined teardrop
+   col(C.nickel,MAT.CHROME);loft(20,20,t=>{const x=lerp(o[0]+0.03,o[0]-0.085,t),e=Math.pow(Math.max(Math.sin(Math.PI*clamp(t*0.98+0.01,0,1)),0),0.5)*(0.35+0.65*t);return {x,y:o[1]+0.004,z:0,w:0.03*e+0.0005,h:0.024*e+0.0005,e:2.2};});
+   col(C.redlens,MAT.GLOW);obox([o[0]-0.06,o[1]+0.004,0],[1,0,0],[0,1,0],0.04,0.03,0.05);}
+  else{col(C.black,MAT.PAINT);latheAt(o,[-1,0,0],[[0,-0.018],[0.024,-0.018],[0.026,0],[0.026,0.026]],20);
+   col(C.redlens,MAT.GLOW);latheAt(add(o,[-0.026,0,0]),[-1,0,0],[[0.026,0],[0.024,0.006],[0,0.008]],20);}
+  col(C.lens,MAT.GLOW);obox(add(o,[-0.012,-0.032,0]),[1,0,0],[0,1,0],0.02,0.006,0.024);
+  col(C.black,MAT.PAINT);obox(add(o,[0.004,-0.075,0]),[0.6,-1,0],[0,0,1],0.1,0.14,0.004);}
+};
+/* panel parametrised along k (rows) with t limits per row */
+function tankPanelK(sec,side,k0,k1,t0f,t1f,off,colr,mat){const nk=24,nt=10,P=[];
+ for(let j=0;j<=nk;j++){const kk=lerp(k0,k1,j/nk);const r=[];for(let i=0;i<=nt;i++)r.push(onSide(sec,lerp(t0f(kk),t1f(kk),i/nt),kk,side,off));P.push(r);}
+ col(colr,mat);grid(P,false,false);}
+/* 5×7 pixel glyphs for the tank transfer lettering */
+const GLYPH={H:'10001100011000111111100011000110001',A:'01110100011000111111100011000110001',R:'11110100011000111110101001001010001',
+ L:'10000100001000010000100001000011111',E:'11111100001000011110100001000011111',Y:'10001100010101000100001000010000100',
+ D:'11110100011000110001100011000111110',V:'10001100011000110001100010101000100',I:'01110001000010000100001000010001110',
+ S:'01111100001000001110000010000111110',O:'01110100011000110001100011000101110',N:'10001110011010110011100011000110001',
+ '-':'00000000000000011111000000000000000'};
+/* lettering placed on a tank side so it reads correctly from that side */
+function lettering(side,txt,t,k,fill,edge,step,h){step=step||0.0118;h=h||0.016;const n=txt.length,px=h/7,pw=step*0.8/5;
+ emblemAt(side,()=>{for(let i=0;i<n;i++){const g=GLYPH[txt[i]];if(!g)continue;const big=i===0||txt[i-1]==='-',sc=big?1.25:1,cx=side*(i-(n-1)/2)*step;
+  for(let r=0;r<7;r++){let c0=-1;for(let c=0;c<=5;c++){const on=c<5&&g[r*5+c]==='1';if(on&&c0<0)c0=c;if(!on&&c0>=0){
+    const x=cx+side*((c0+c-1)/2-2)*pw*sc,y=(3-r)*px*sc+(big?h*0.12:0),w=(c-c0)*pw*sc;
+    if(edge!==fill){col(edge,MAT.PAINT);box(x,y,0.0006,w+0.0024,px*sc+0.0024,0.0012);}
+    col(fill,MAT.PAINT);box(x,y,0.0013,w,px*sc,0.0012);c0=-1;}}}}},t,k);}
+/* flying diamond with HARLEY / DAVIDSON blocks and three speed lines trailing back */
+function diamond(fill,edge,txt,lines){col(edge,MAT.PAINT);extrude([[0.068,0],[0,0.034],[-0.068,0],[0,-0.034]],0,0.0012);
+ col(fill,MAT.PAINT);extrude([[0.062,0],[0,0.0305],[-0.062,0],[0,-0.0305]],0,0.0018);
+ col(txt,MAT.PAINT);for(let i=0;i<6;i++)box(-0.022+i*0.0088,0.009,0.0021,0.006,0.009,0.0008);for(let i=0;i<8;i++)box(-0.031+i*0.0088,-0.007,0.0021,0.006,0.009,0.0008);
+ col(lines,MAT.PAINT);for(const [y,l] of [[0.016,0.07],[0.0,0.1],[-0.016,0.07]])box(-0.07-l/2+0.02,y,0.0014,l,0.0045,0.0008);}
+/* parts whose shape changes with the Year control (shapes follow the reference photos) */
+const ALTS={
+ graphics:{keys:['script','eagle','d34','d35','b36'],pick:y=>({1932:'script',1933:'eagle',1934:'d34',1935:'d35',1936:'b36'})[y]},
+ ffender:{keys:['stripe','black','crown','skirt'],pick:y=>y===1932?'stripe':y===1933?'black':y===1934?'crown':'skirt'},
+ rfender:{keys:['stripe','black','crown','skirt'],pick:y=>y===1932?'stripe':y===1933?'black':y===1934?'crown':'skirt'},
+ exhaust:{keys:['low','hiflo','fishtail'],pick:y=>y<1934?'low':(y===1934?'hiflo':'fishtail')},
+ tail:{keys:['plain','airflow'],pick:y=>y<1934?'plain':'airflow'},
+ saddle:{keys:['tan','black'],pick:y=>y===1932?'tan':'black'},
+ rbrake:{keys:['band','drum'],pick:y=>y<1935?'band':'drum'}
+};
+/* explode offsets (metres), outward along each system's axis */
+const EX={
+ cyl:[0.02,0.32,0], crank:[0,-0.05,0], valves:[0.07,0.0,0.32], oilpump:[-0.09,-0.05,0.44], carb:[0,0.11,0.46], exhaust:[0,-0.06,0.38],
+ gear:[-0.11,-0.02,0.3], clutch:[-0.18,-0.1,-0.44], shifter:[0.05,0.2,-0.36], kick:[-0.07,-0.04,0.5],
+ primary:[0,0,-0.3], pcover:[0,0.32,-0.46], final:[-0.05,0,0.3],
+ frame:[0,0,0], fork:[0.3,0.12,0], toolbox:[0.42,0.02,0], saddle:[-0.07,0.32,0], boards:[0,-0.12,0],
+ fwheel:[0.6,0,0], rwheel:[-0.52,0,0], fbrake:[0.6,0,-0.3], rbrake:[-0.52,0,0.32],
+ tank:[0,0.32,0.22], oiltank:[0,0.32,-0.22], graphics:[0,0.32,0], ffender:[0.6,0.28,0], rfender:[-0.5,0.32,0], horn:[0.52,-0.04,0], tail:[-0.38,0.16,0],
+ gen:[0.36,-0.04,0], ign:[-0.05,0.22,0.24], battery:[-0.05,0.26,-0.3], bars:[0.13,0.3,0], headlamp:[0.46,0.14,0]
+};
+/* graphics ride with whichever tank half they sit on: [side, explode key] */
+const SPLIT={graphics:[[1,'tank'],[-1,'oiltank']]};
+/* ------------------------------- WebGL ------------------------------- */
+const stage=document.getElementById('stage'), canvas=document.getElementById('gl');
+if(FW&&FH){stage.classList.add('fixed');stage.style.width=FW+'px';stage.style.height=FH+'px';}
+const gl=canvas.getContext('webgl',{antialias:true,stencil:true,alpha:false,preserveDrawingBuffer:FREEZE||CAPTURE});
+if(!gl){document.getElementById('err').style.display='flex';throw new Error('WebGL unavailable');}
+function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
+function prog(vs,fs){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,vs));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));
+ gl.bindAttribLocation(p,0,'aP');gl.bindAttribLocation(p,1,'aN');gl.bindAttribLocation(p,2,'aC');gl.linkProgram(p);
+ if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);
+ for(let i=0;i<n;i++){const a=gl.getActiveUniform(p,i);u[a.name]=gl.getUniformLocation(p,a.name);}return {p,u};}
+const VS_MAIN=`attribute vec3 aP;attribute vec3 aN;attribute vec4 aC;uniform mat4 uVP;uniform mat4 uM;
+varying vec3 vN;varying vec3 vW;varying vec4 vC;
+void main(){vec4 w=uM*vec4(aP,1.0);vW=w.xyz;vN=aN;vC=aC;gl_Position=uVP*w;}`;
+/* Blinn-Phong: key + fill + rim lights, fake environment for nickel, two-sided normals */
+const FS_MAIN=`precision highp float;varying vec3 vN;varying vec3 vW;varying vec4 vC;
+uniform vec3 uEye;uniform vec3 uBody;uniform vec3 uFrame;uniform vec3 uStripe;uniform float uSel;uniform float uHover;uniform float uDim;uniform float uTime;
+void main(){
+ vec3 N=normalize(vN);vec3 V=normalize(uEye-vW);if(dot(N,V)<0.0)N=-N;
+ float m=floor(vC.a*8.0+0.5);vec3 base=vC.rgb;
+ if(m>4.5&&m<5.5)base=uBody;else if(m>5.5&&m<6.5)base=uFrame;else if(m>6.5)base=uStripe;
+ float shin=70.0,ks=0.55,kd=0.9;
+ if(m>0.5&&m<1.5){shin=110.0;ks=1.1;kd=0.35;}else if(m>1.5&&m<2.5){shin=10.0;ks=0.06;kd=1.0;}else if(m>2.5&&m<3.5){shin=34.0;ks=0.5;kd=0.75;}
+ else if(m>6.5){shin=40.0;ks=0.3;kd=1.0;}
+ vec3 L1=normalize(vec3(0.45,0.85,0.55));vec3 L2=normalize(vec3(-0.7,0.35,-0.6));vec3 L3=normalize(vec3(-0.2,0.5,0.9));
+ float d1=max(dot(N,L1),0.0),d2=max(dot(N,L2),0.0),d3=max(dot(N,L3),0.0);
+ float s1=pow(max(dot(N,normalize(L1+V)),0.0),shin)*ks,s2=pow(max(dot(N,normalize(L2+V)),0.0),shin)*ks*0.45,s3=pow(max(dot(N,normalize(L3+V)),0.0),shin)*ks*0.35;
+ vec3 amb=mix(vec3(0.075,0.07,0.065),vec3(0.20,0.19,0.17),N.y*0.5+0.5);
+ vec3 c=base*(amb+kd*(d1*vec3(1.0,0.93,0.82)*1.15+d2*vec3(0.42,0.48,0.6)*0.55+d3*vec3(0.55,0.5,0.45)*0.35));
+ if(m>0.5&&m<1.5){vec3 R=reflect(-V,N);float e=smoothstep(-0.3,0.7,R.y);vec3 env=mix(vec3(0.06,0.055,0.05),vec3(0.9,0.86,0.78),e)+vec3(1.2,1.1,0.95)*smoothstep(0.82,0.97,R.y)+vec3(0.5)*smoothstep(0.9,1.0,abs(R.x));
+  c=mix(c,base*env,0.7);}
+ c+=s1*vec3(1.0,0.96,0.88)+s2*vec3(0.6,0.7,0.85)+s3*vec3(0.8);
+ float fr=pow(1.0-max(dot(N,V),0.0),3.0);c+=fr*0.10*vec3(0.95,0.82,0.6);
+ if(m>3.5&&m<4.5)c=base*1.15+fr*0.15;
+ float g=dot(c,vec3(0.3,0.59,0.11));c=mix(c,vec3(g)*0.42,uDim);
+ float pulse=0.5+0.5*sin(uTime*4.0);
+ float rim=smoothstep(0.15,0.9,1.0-max(dot(N,V),0.0));
+ c=mix(c,c*1.18+vec3(0.012,0.011,0.01),uSel*0.7);
+ c+=uSel*(vec3(1.0,0.93,0.8)*rim*rim*rim*(0.42+0.08*pulse)+vec3(0.05,0.047,0.04)*(0.85+0.15*pulse));
+ c+=uHover*vec3(0.13,0.1,0.05)*(0.45+fr);
+ gl_FragColor=vec4(c,1.0);}`;
+const VS_SHADOW=`attribute vec3 aP;uniform mat4 uVP;uniform mat4 uS;uniform mat4 uM;void main(){gl_Position=uVP*(uS*(uM*vec4(aP,1.0)));}`;
+const FS_SHADOW=`precision mediump float;uniform float uA;void main(){gl_FragColor=vec4(0.02,0.015,0.01,uA);}`;
+const VS_PICK=`attribute vec3 aP;uniform mat4 uVP;uniform mat4 uM;void main(){gl_Position=uVP*(uM*vec4(aP,1.0));}`;
+const FS_PICK=`precision mediump float;uniform vec3 uId;void main(){gl_FragColor=vec4(uId,1.0);}`;
+const VS_GROUND=`attribute vec3 aP;uniform mat4 uVP;varying vec2 vXZ;void main(){vXZ=aP.xz;gl_Position=uVP*vec4(aP,1.0);}`;
+const FS_GROUND=`precision highp float;varying vec2 vXZ;uniform vec3 uBg;uniform float uSpread;
+void main(){float r=length(vXZ);vec3 c=mix(vec3(0.20,0.185,0.16),uBg,smoothstep(0.2,4.2,r));
+ float ring=smoothstep(0.006,0.0,abs(r-1.32))*0.22;c+=ring*vec3(0.85,0.7,0.42)*(1.0-smoothstep(1.0,2.0,r));
+ c+=step(r,1.32)*0.022;
+ float d=length(vec2(vXZ.x/(0.95+uSpread*0.6),vXZ.y/(0.32+uSpread*0.3)));c*=mix(0.45,1.0,smoothstep(0.15,1.15,d));
+ gl_FragColor=vec4(c,1.0);}`;
+const P_MAIN=prog(VS_MAIN,FS_MAIN),P_SHADOW=prog(VS_SHADOW,FS_SHADOW),P_PICK=prog(VS_PICK,FS_PICK),P_GROUND=prog(VS_GROUND,FS_GROUND);
+
+
+/* build every part (each Year variant and each tank side) into its own buffer */
+const PARTS=[];const PID={};let totalVerts=0;
+function mkBuf(fn){V=[];setXF(M4.id());fn();const arr=new Float32Array(V);V=null;const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.STATIC_DRAW);return {buf,count:arr.length/10,arr};}
+for(const id of Object.keys(DATA)){
+ const keys=ALTS[id]?ALTS[id].keys:[null],sides=SPLIT[id]||[[0,id]];const vars={};
+ const mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
+ for(const k of keys){vars[k]=sides.map(([side,exk])=>{const b=mkBuf(()=>BUILD[id](k,side));const a=b.arr;
+   for(let i=0;i<a.length;i+=10)for(let q=0;q<3;q++){mn[q]=Math.min(mn[q],a[i+q]);mx[q]=Math.max(mx[q],a[i+q]);}
+   return {buf:b.buf,count:b.count,ex:EX[exk]||[0,0,0]};});}
+ const p={id,idx:PARTS.length,vars,draws:vars[keys[0]],center:scl(add(mn,mx),0.5),ex:EX[id]||[0,0,0],d:DATA[id],e:0,sel:0,selA:0,dimA:0};
+ PID[id]=p;PARTS.push(p);}
+function countVerts(){let n=0;for(const p of PARTS)for(const dr of p.draws)n+=dr.count;return n;}
+const groundBuf=gl.createBuffer();{const g=[];const n=96,Rg=7;for(let i=0;i<n;i++){const a0=i/n*TAU,a1=(i+1)/n*TAU;g.push(0,0,0,Rg*Math.cos(a0),0,Rg*Math.sin(a0),Rg*Math.cos(a1),0,Rg*Math.sin(a1));}
+ gl.bindBuffer(gl.ARRAY_BUFFER,groundBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(g),gl.STATIC_DRAW);}
+
+/* colour-ID pick framebuffer */
+let pickFB=null,pickTex=null,pickRB=null,pickW=0,pickH=0;
+function ensurePick(w,h){if(pickFB&&pickW===w&&pickH===h)return;if(pickFB){gl.deleteFramebuffer(pickFB);gl.deleteTexture(pickTex);gl.deleteRenderbuffer(pickRB);}
+ pickW=w;pickH=h;pickTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,pickTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+ for(const [k,v] of [[gl.TEXTURE_MIN_FILTER,gl.NEAREST],[gl.TEXTURE_MAG_FILTER,gl.NEAREST],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);
+ pickRB=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,pickRB);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,w,h);
+ pickFB=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,pickFB);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,pickTex,0);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,pickRB);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);}
+
+
+/* ------------------------------ state ------------------------------- */
+const HOME={yaw:0.62,pitch:0.2,dist:3.1,t:[0.02,0.44,0]};
+const cam={yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()},goal={yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()};
+let explodeTarget=Q.get('explode')==='1'?1:0,explodeCur=explodeTarget,autoRotate=true,lastInput=-1e9,selected=null,hovered=null,variantSel=null,lensShift=0,lensGoal=0,confOpen=false;
+if(explodeTarget){cam.dist=goal.dist=4.8;cam.t=goal.t=[0.02,0.6,0];}
+let year=YEARS.includes(+Q.get('year'))?+Q.get('year'):1932;
+let paintIdx=Q.get('paint')&&PAINTS.some(p=>p.id===Q.get('paint'))?PAINTS.findIndex(p=>p.id===Q.get('paint')):Math.max(0,PAINTS.findIndex(p=>p.year===year));
+const PAINT_LOCK=!!Q.get('paint');
+const curPaint={body:PAINTS[paintIdx].body.slice(),frame:PAINTS[paintIdx].frame.slice(),tone:PAINTS[paintIdx].tone.slice()};
+let W=1,H=1,DPR=1;
+function resize(){const r=stage.getBoundingClientRect();W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));DPR=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);stage.style.setProperty('--u',(Math.min(H/720,W/1100)).toFixed(4)+'px');}
+window.addEventListener('resize',resize);resize();
+function eyeOf(c){const cp=Math.cos(c.pitch);return [c.t[0]+c.dist*cp*Math.sin(c.yaw),c.t[1]+c.dist*Math.sin(c.pitch),c.t[2]+c.dist*cp*Math.cos(c.yaw)];}
+function viewProj(){const asp=canvas.width/canvas.height,fy=asp<1.5?2*Math.atan(Math.tan(17*Math.PI/180)*1.5/asp):34*Math.PI/180;const P=M4.persp(fy,asp,0.05,40);
+ for(let c=0;c<4;c++)P[c*4]+=lensShift*P[c*4+3];   // lens shift: x_clip += s*w, so the subject slides sideways for the panel
+ const eye=eyeOf(cam);return {vp:M4.mul(P,M4.lookAt(eye,cam.t,[0,1,0])),eye};}
+const LIGHT=[0.45,0.85,0.55];
+const SHM=(()=>{const m=M4.id();m[4]=-LIGHT[0]/LIGHT[1];m[5]=0;m[6]=-LIGHT[2]/LIGHT[1];m[13]=0.0015;return m;})(); // planar projection onto y=0
+function drawModel(p,dr){const e=p.e;return M4.trans(dr.ex[0]*e,dr.ex[1]*e,dr.ex[2]*e);}
+function bindBuf(dr,all){gl.bindBuffer(gl.ARRAY_BUFFER,dr.buf);gl.vertexAttribPointer(0,3,gl.FLOAT,false,40,0);if(all){gl.vertexAttribPointer(1,3,gl.FLOAT,false,40,12);gl.vertexAttribPointer(2,4,gl.FLOAT,false,40,24);}}
+let timeSec=0;const BG=[0.07,0.064,0.056];
+function render(){const {vp,eye}=viewProj();
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,canvas.width,canvas.height);
+ gl.clearColor(BG[0],BG[1],BG[2],1);gl.clearStencil(0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT|gl.STENCIL_BUFFER_BIT);
+ gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
+ gl.useProgram(P_GROUND.p);gl.uniformMatrix4fv(P_GROUND.u.uVP,false,vp);gl.uniform3fv(P_GROUND.u.uBg,BG);gl.uniform1f(P_GROUND.u.uSpread,explodeCur);
+ gl.enableVertexAttribArray(0);gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);
+ gl.bindBuffer(gl.ARRAY_BUFFER,groundBuf);gl.vertexAttribPointer(0,3,gl.FLOAT,false,12,0);gl.drawArrays(gl.TRIANGLES,0,96*3);
+ gl.useProgram(P_SHADOW.p);gl.uniformMatrix4fv(P_SHADOW.u.uVP,false,vp);gl.uniformMatrix4fv(P_SHADOW.u.uS,false,SHM);gl.uniform1f(P_SHADOW.u.uA,0.42);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.enable(gl.STENCIL_TEST);gl.stencilFunc(gl.EQUAL,0,0xff);gl.stencilOp(gl.KEEP,gl.KEEP,gl.INCR);
+ for(const p of PARTS)for(const dr of p.draws){if(!dr.count)continue;gl.uniformMatrix4fv(P_SHADOW.u.uM,false,drawModel(p,dr));bindBuf(dr,false);gl.drawArrays(gl.TRIANGLES,0,dr.count);}
+ gl.disable(gl.STENCIL_TEST);gl.disable(gl.BLEND);gl.depthMask(true);
+ gl.useProgram(P_MAIN.p);const u=P_MAIN.u;gl.uniformMatrix4fv(u.uVP,false,vp);gl.uniform3fv(u.uEye,eye);gl.uniform3fv(u.uBody,curPaint.body);gl.uniform3fv(u.uFrame,curPaint.frame);gl.uniform3fv(u.uStripe,curPaint.tone);gl.uniform1f(u.uTime,timeSec);
+ gl.enableVertexAttribArray(1);gl.enableVertexAttribArray(2);
+ for(const p of PARTS){gl.uniform1f(u.uSel,p.selA);gl.uniform1f(u.uHover,p===hovered&&!TOUR?1:0);gl.uniform1f(u.uDim,p.dimA);
+  for(const dr of p.draws){if(!dr.count)continue;gl.uniformMatrix4fv(u.uM,false,drawModel(p,dr));bindBuf(dr,true);gl.drawArrays(gl.TRIANGLES,0,dr.count);}}
+ gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);}
+function pickAt(cx,cy){const w=canvas.width,h=canvas.height;ensurePick(w,h);const {vp}=viewProj();
+ gl.bindFramebuffer(gl.FRAMEBUFFER,pickFB);gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);
+ gl.useProgram(P_PICK.p);gl.uniformMatrix4fv(P_PICK.u.uVP,false,vp);gl.enableVertexAttribArray(0);gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);
+ for(const p of PARTS){gl.uniform3f(P_PICK.u.uId,(p.idx+1)/255,0,0);for(const dr of p.draws){if(!dr.count)continue;gl.uniformMatrix4fv(P_PICK.u.uM,false,drawModel(p,dr));bindBuf(dr,false);gl.drawArrays(gl.TRIANGLES,0,dr.count);}}
+ const px=new Uint8Array(4);gl.readPixels(clamp(Math.floor(cx*DPR),0,w-1),clamp(Math.floor(h-cy*DPR-1),0,h-1),1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+ return px[0]>0?PARTS[px[0]-1]||null:null;}
+
+/* --------------------------------- UI -------------------------------- */
+const $=id=>document.getElementById(id);const panel=$('panel');
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function confHTML(id,compact){const c=CONFLICTS[id];
+ if(compact)return `<div class="conf"><h3>⚠ Source conflict</h3><h4>${esc(c.title)}</h4><p>${esc(c.res)}</p></div>`;
+ return `<div class="conf"><h3>⚠ Source conflict</h3><h4>${esc(c.title)}</h4><div class="kd">${esc(c.kind)}</div><p><b>One side:</b> ${esc(c.a)}</p><p><b>Other side:</b> ${esc(c.b)}</p><p>${esc(c.res)}</p></div>`;}
+function panelHTML(d,o){o=o||{};const sys=SYS[d.sys];
+ const head=`<button class="x" aria-label="Close">×</button><div class="chip" style="color:${sys.col}">${esc(sys.name)}</div><h2>${esc(d.name)}</h2>`;
+ if(d.nodata)return head+`<div class="nodata">${esc(NODATA)}</div>`;
+ const specs=o.max?d.specs.slice(0,o.max):d.specs;const work=d.work&&!o.noWork?(o.maxWork?d.work.slice(0,o.maxWork):d.work):null;
+ const conf=d.conf&&!o.noConf?(o.maxConf?d.conf.slice(0,o.maxConf):d.conf):null;
+ return head+`<ul>${specs.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+ ${work?`<div class="weak"><h3>Workshop note</h3>${work.map(w=>`<p>${esc(w)}</p>`).join('')}</div>`:''}
+ ${conf?conf.map(c=>confHTML(c,o.compactConf)).join(''):''}
+ ${d.note&&!o.noNote?`<div class="note">${esc(d.note)}</div>`:''}${d.sec?`<div class="src">Source: Studio report ${esc(d.sec)}</div>`:''}`;}
+function conflictsHTML(){return `<button class="x" aria-label="Close">×</button><div class="chip" style="color:#f0a35a">${CONF_ORDER.length} flagged</div><h2>Source conflicts in the report</h2>
+ <ul><li>Shown wherever they apply: in the part panels and here. Nothing is silently resolved.</li></ul>${CONF_ORDER.map(id=>confHTML(id,false)).join('')}<div class="src">Source: Studio report §2, §4, §6, §7, §8, §11, §12</div>`;}
+function yearsHTML(y,o){o=o||{};return `${o.noX?'':'<button class="x" aria-label="Close">×</button>'}<div class="chip" style="color:${SYS.body.col}">Year by year · report §8, §11</div><h2>Five years of the 45 Flathead</h2>
+ ${YEARS.map(Y=>`<div class="yr${Y===y?' on':(Y<y?' past':'')}"><b>${Y}</b><span>${esc(YEAR_NOTES[Y])}</span></div>`).join('')}
+ <div class="note">Paint: ${esc(PAINTS[paintIdx].name)} (${esc(PAINTS[paintIdx].years)}). Colours and tank-graphic shapes follow reference photos; the report names no factory colours.</div>`;}
+function showPanel(html){panel.innerHTML=html;panel.classList.add('show');const x=panel.querySelector('.x');if(x)x.onclick=()=>select(null);}
+function clearModes(){confOpen=false;$('bConf').classList.remove('on');}
+function select(p){clearModes();selected=p;variantSel=null;document.querySelectorAll('.var').forEach(e=>e.classList.remove('on'));PARTS.forEach(q=>q.sel=(q===p)?1:0);
+ document.querySelectorAll('#partsDrawer a').forEach(a=>a.classList.toggle('sel',!!p&&a.dataset.id===p.id));
+ if(p){showPanel(panelHTML(p.d));goal.t=lerp3(HOME.t,add(p.center,scl(p.ex,explodeTarget)),0.7);lensGoal=W>760?-0.24:0;}
+ else{panel.classList.remove('show');goal.t=HOME.t.slice();lensGoal=0;}}
+function selectVariant(i){const v=VARIANTS[i];if(variantSel===i){select(null);return;}select(null);variantSel=i;
+ document.querySelectorAll('.var').forEach((e,k)=>e.classList.toggle('on',k===i));PARTS.forEach(q=>q.sel=v.parts.includes(q.id)?1:0);
+ showPanel(`<button class="x" aria-label="Close">×</button><div class="chip" style="color:var(--brass)">Variant · ${esc(v.info)}</div><h2>${esc(v.code)}: ${esc(v.label)}</h2><ul><li>${esc(v.text)}</li></ul>
+ ${v.conf?confHTML(v.conf,false):''}<div class="fin"><b>Highlighted:</b> ${v.parts.map(id=>esc(DATA[id].name)).join(', ')}</div><div class="note">${esc(SUFFIXES)}</div><div class="src">Source: Studio report §10, §12</div>`);lensGoal=W>760?-0.24:0;}
+function openConflicts(){if(confOpen){select(null);return;}select(null);confOpen=true;$('bConf').classList.add('on');
+ PARTS.forEach(q=>q.sel=['cyl','crank','pcover','rbrake','graphics','tail'].includes(q.id)?1:0);showPanel(conflictsHTML());lensGoal=W>760?-0.24:0;}
+{let h='';for(const s of SYS_ORDER){h+=`<h4>${esc(SYS[s].name)}</h4>`;for(const id of Object.keys(DATA))if(DATA[id].sys===s)h+=`<a data-id="${id}"><span class="dot" style="background:${SYS[s].col}"></span>${esc(DATA[id].name)}${DATA[id].nodata?' <i style="color:#8d826d">(no data)</i>':''}${DATA[id].conf?' <span style="color:#f0a35a">⚠</span>':''}</a>`;}
+ $('partsDrawer').innerHTML=h;$('partsDrawer').querySelectorAll('a').forEach(a=>a.onclick=()=>{select(PID[a.dataset.id]);lastInput=performance.now();});}
+$('variants').innerHTML=VARIANTS.map((v,i)=>`<div class="var${v.conf?' flag':''}" data-i="${i}"><b>${esc(v.code)}</b><span>${esc(v.label)}</span>${v.conf?'<span class="cf">⚠ conflict</span>':''}<div><i>${esc(v.info)}</i></div></div>`).join('');
+document.querySelectorAll('.var').forEach(e=>e.onclick=()=>selectVariant(+e.dataset.i));
+function setExplode(on){explodeTarget=on?1:0;$('bExplode').classList.toggle('on',on);goal.dist=on?Math.max(goal.dist,4.8):HOME.dist;if(!selected)goal.t=on?[0.02,0.6,0]:HOME.t.slice();if(selected)goal.t=lerp3(HOME.t,add(selected.center,scl(selected.ex,explodeTarget)),0.7);}
+function setYear(y,keepPaint){year=y;if(!keepPaint&&!PAINT_LOCK){const pi=PAINTS.findIndex(p=>p.year===y);if(pi>=0){paintIdx=pi;if(typeof paintLabel==='function')paintLabel();}}for(const id of Object.keys(ALTS)){const p=PID[id];if(!p)continue;p.draws=p.vars[ALTS[id].pick(y)];}totalVerts=countVerts();
+ $('bYear').textContent='Year: '+y;$('yearLine').textContent=y+' · '+YEAR_NOTES[y];}
+function paintLabel(){$('bFinish').textContent='Paint: '+PAINTS[paintIdx].name;}
+$('bExplode').onclick=()=>setExplode(!explodeTarget);
+$('bRotate').onclick=()=>{autoRotate=!autoRotate;$('bRotate').classList.toggle('on',autoRotate);};
+$('bYear').onclick=()=>{setYear(YEARS[(YEARS.indexOf(year)+1)%YEARS.length]);if(!selected&&variantSel===null&&!confOpen){showPanel(yearsHTML(year));lensGoal=W>760?-0.24:0;PARTS.forEach(q=>q.sel=['graphics','ffender','rfender','tail','exhaust','rbrake'].includes(q.id)?1:0);}};
+$('bFinish').onclick=()=>{paintIdx=(paintIdx+1)%PAINTS.length;paintLabel();};paintLabel();
+$('bConf').onclick=openConflicts;
+$('bReset').onclick=()=>{select(null);setExplode(false);Object.assign(goal,{yaw:HOME.yaw,pitch:HOME.pitch,dist:HOME.dist,t:HOME.t.slice()});};
+$('bParts').onclick=()=>{$('partsDrawer').classList.toggle('open');$('bParts').classList.toggle('on');};
+$('bTour').onclick=()=>{const q=new URLSearchParams(location.search);q.set('tour','1');location.search=q.toString();};
+if(explodeTarget)$('bExplode').classList.add('on');
+setYear(year);
+
+/* --------------------------- interaction ---------------------------- */
+const ptrs=new Map();let moved=0,pinch0=0,dist0=0,hoverReq=null,lastHover=0;
+canvas.addEventListener('pointerdown',e=>{if(TOUR)return;canvas.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===1)moved=0;
+ if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);dist0=goal.dist;moved=99;}canvas.classList.add('drag');lastInput=performance.now();});
+canvas.addEventListener('pointermove',e=>{if(TOUR)return;const r=canvas.getBoundingClientRect();
+ if(ptrs.has(e.pointerId)){const p=ptrs.get(e.pointerId);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+  if(ptrs.size===1){goal.yaw-=dx*0.008;goal.pitch=clamp(goal.pitch+dy*0.006,0.02,1.3);}
+  else if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0>0&&d>0)goal.dist=clamp(dist0*pinch0/d,0.8,7);}
+  lastInput=performance.now();}
+ else hoverReq={x:e.clientX-r.left,y:e.clientY-r.top};});
+function endPtr(e){if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);
+ if(ptrs.size===0){canvas.classList.remove('drag');if(moved<6){const r=canvas.getBoundingClientRect();const p=pickAt(e.clientX-r.left,e.clientY-r.top);select(p&&p===selected?null:p);}}}
+canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);
+canvas.addEventListener('wheel',e=>{if(TOUR)return;e.preventDefault();goal.dist=clamp(goal.dist*Math.exp(e.deltaY*0.0012),0.8,7);lastInput=performance.now();},{passive:false});
+canvas.addEventListener('pointerleave',()=>{hovered=null;$('tooltip').style.opacity=0;canvas.classList.remove('hot');});
+window.addEventListener('keydown',e=>{if(TOUR)return;const k=e.key.toLowerCase();if(k==='e')setExplode(!explodeTarget);else if(k==='escape')select(null);else if(k==='t')$('bTour').click();else if(k==='r')$('bReset').click();
+ else if(k==='y')$('bYear').click();else if(k==='p')$('bFinish').click();else if(k==='c')openConflicts();});
+
+/* ------------------------------- tour --------------------------------
+   0–4.5 s title card · 4.5–10 orbit · 10–13 explode · 13–50.5 eight stops
+   (engine, generator, oiling, gearbox, chassis, brakes, source conflict, year by year)
+   50.5–53.5 wide · 53.5–59.5 end card · loop */
+const STOPS=[
+ {id:'cyl',sel:['cyl','valves'],yaw:0.45,pitch:0.24,dist:1.3,kick:'Engine',title:'45 cu in flathead V-twin',sub:'45° side-valve · 2.75 in × 3.81 in · low-compression R, higher-compression RL and RLD'},
+ {id:'gen',sel:['gen'],yaw:2.25,pitch:0.14,dist:1.05,kick:'Electrics',title:'The generator lies down',sub:'Horizontal, in front of the crankcase · the end of the D-series “3-cylinder Harley”'},
+ {id:'oilpump',sel:['oilpump','oiltank'],yaw:0.55,pitch:0.22,dist:1.2,kick:'Lubrication',title:'Total-loss oiling',sub:'7.5 pints in the left tank · consumed or vented, never returned'},
+ {id:'gear',sel:['gear','shifter','clutch','primary','pcover'],yaw:-2.6,pitch:0.22,dist:1.55,kick:'Transmission',title:'Hand shift, foot clutch',sub:'Sliding gears 1932–34 · constant mesh and a 4-plate clutch from 1935'},
+ {id:'fork',sel:['fork','frame'],yaw:1.15,pitch:0.14,dist:1.9,kick:'Chassis',title:'Springer fork, single downtube',sub:'Leading-link springer · rigid rear · 57.5 in or 57.7 in wheelbase'},
+ {id:'brakes',sel:['fbrake','rbrake'],kick:'Brakes',title:'Drum in front, band at the back',sub:'Contracting band rear brake before 1935 · after that, the sources disagree'},
+ {id:'conflict',sel:['pcover','primary','final'],kick:'Source conflict',title:'Which side is the drive on?',sub:'Report: right-side primary · every photo: primary cover on the left'},
+ {id:'styling',sel:['graphics','ffender','rfender','tail','exhaust'],kick:'Year by year',title:'1932 to 1936',sub:''}
+];
+const STYLE_SUB={1932:'1932 · Horizontal generator · simplified panel striping',1933:'1933 · Trim and finish updates · eagle tank as on the photo',1934:'1934 · Art Deco tank graphics · streamline tail light',
+ 1935:'1935 · Skirted rear fender · constant mesh · 4-plate clutch',1936:'1936 · Final year · updated decals and paint schemes'};
+const TT={title:4.5,orbit:10,expl:13,stopsEnd:50.5,asm:53.5,end:59.5};
+const DUR=[4,4,4,4,4,5,5,7.5];const STOP_T0=DUR.reduce((a,d)=>{a.push(a[a.length-1]+d);return a;},[TT.expl]);
+const pc=id=>add(PID[id].center,PID[id].ex);
+function avgPc(ids){let s=[0,0,0];for(const id of ids)s=add(s,pc(id));return scl(s,1/ids.length);}
+function lerpCam(a,b,t){return {yaw:lerp(a.yaw,b.yaw,t),pitch:lerp(a.pitch,b.pitch,t),dist:lerp(a.dist,b.dist,t),t:lerp3(a.t,b.t,t)};}
+function stopCam(k,u){const s=STOPS[k];
+ if(s.id==='brakes'){const f={yaw:2.35-0.03*u,pitch:0.2,dist:1.45,t:add(add(F,PID.fbrake.ex),[0,0.04,-0.06])},r={yaw:0.1+0.03*u,pitch:0.24,dist:1.45,t:add(add(R,PID.rbrake.ex),[0,0.04,0.06])};return lerpCam(f,r,ease((u-2.6)/1.1));}
+ if(s.id==='conflict'){const a={yaw:-2.75,pitch:0.2,dist:2.2,t:pc('pcover')},b={yaw:-3.55,pitch:0.22,dist:2.4,t:avgPc(['pcover','final'])};return lerpCam(a,b,ease((u-0.6)/4));}
+ if(s.id==='styling'){return {yaw:lerp(0.95,0.3,ease((u-0.4)/6.6)),pitch:0.13,dist:3.0,t:[0.0,0.5,0]};}
+ const t=s.id==='fork'?lerp3(pc('fork'),pc('frame'),0.35):s.id==='oilpump'?lerp3(pc('oilpump'),pc('oiltank'),0.35):s.id==='gear'?avgPc(['gear','primary']):pc(s.id);
+ return {yaw:s.yaw+0.035*u,pitch:s.pitch,dist:s.dist,t};}
+const TC0={yaw:0.9,pitch:0.1,dist:2.9,t:[0.02,0.46,0]};
+const EXPL_END={yaw:0.72,pitch:0.3,dist:4.3,t:[0.02,0.58,0]};
+const WIDE={yaw:0.6,pitch:0.18,dist:2.75,t:[0.02,0.46,0]};
+const SK=7; // year-by-year stop index
+function styleAt(u){ // year + paint during the year-by-year stop
+ const y=u<1.6?1932:u<3.0?1933:u<4.4?1934:u<5.8?1935:1936;return {y,p:PAINTS.find(p=>p.year===y).id};}
+function tourAt(t,first){const o={cam:null,explode:0,sel:[],panel:null,cap:null,card:null,cardA:0,stop:-1,capA:0,panA:0,year:1932,paint:'olive'};
+ if(t<TT.title){o.cam={yaw:TC0.yaw+0.04*t,pitch:TC0.pitch,dist:TC0.dist,t:TC0.t};o.card='title';o.cardA=(first&&t<0.7?t/0.7:1)*(t>3.8?1-(t-3.8)/0.7:1);}
+ else if(t<TT.orbit){const u=ease((t-TT.title)/(TT.orbit-TT.title));o.cam={yaw:TC0.yaw+0.18+TAU*u,pitch:lerp(0.1,0.22,u),dist:lerp(2.9,2.6,u),t:TC0.t};}
+ else if(t<TT.expl){const u=(t-TT.orbit)/(TT.expl-TT.orbit);o.cam=lerpCam({yaw:TC0.yaw+0.18,pitch:0.22,dist:2.6,t:TC0.t},EXPL_END,ease(u));o.explode=ease(u*1.1);}
+ else if(t<TT.stopsEnd){let k=0;while(k<7&&t>=STOP_T0[k+1])k++;const u=t-STOP_T0[k],D=DUR[k];const prev=k===0?EXPL_END:stopCam(k-1,DUR[k-1]);
+  o.cam=lerpCam(prev,stopCam(k,u),ease(u/1.4));o.explode=k===SK?1-ease(u/1.3):1;o.sel=STOPS[k].sel;o.stop=k;
+  if(k===SK){const s=styleAt(u);o.year=s.y;o.paint=s.p;}
+  o.panel=(u>0.55&&u<D-0.25)?k:null;o.cap=(u>0.45&&u<D-0.2)?k:null;
+  o.capA=clamp((u-0.45)/0.45,0,1)*clamp((D-0.2-u)/0.35,0,1);o.panA=clamp((u-0.55)/0.4,0,1)*clamp((D-0.25-u)/0.35,0,1);}
+ else if(t<TT.asm){const u=(t-TT.stopsEnd)/(TT.asm-TT.stopsEnd);o.cam=lerpCam(stopCam(SK,DUR[SK]),WIDE,ease(u/0.8));o.explode=0;o.year=1936;o.paint='gold';}
+ else{const u=(t-TT.asm)/(TT.end-TT.asm);o.cam=lerpCam(WIDE,{yaw:TC0.yaw,pitch:TC0.pitch,dist:TC0.dist,t:TC0.t},ease(u));o.card='end';o.cardA=clamp((t-TT.asm-0.3)/0.8,0,1);o.year=1936;o.paint='gold';}
+ return o;}
+function stopPanel(k){const s=STOPS[k];
+ if(s.id==='brakes'){const f=DATA.fbrake,r=DATA.rbrake;return panelHTML({sys:'brakes',name:'Front & rear brakes',specs:[f.specs[0],r.specs[0],r.specs[1],r.specs[2]],sec:'§6, §12'})+confHTML('brake',true);}
+ if(s.id==='fork'){const f=DATA.fork,fr=DATA.frame;return panelHTML({sys:'frame',name:'Fork & single-downtube frame',specs:[f.specs[0],f.specs[1],fr.specs[0],fr.specs[2],fr.specs[3]],sec:'§5, §7'});}
+ if(s.id==='oilpump'){const a=DATA.oilpump;return panelHTML({sys:'engine',name:'Total-loss oiling',specs:a.specs.slice(0,4),work:[a.work[0]],sec:'§2, §13'});}
+ if(s.id==='gear'){const g=DATA.gear,c=DATA.clutch,sh=DATA.shifter;return panelHTML({sys:'trans',name:'Gearbox & clutch',specs:[g.specs[0],g.specs[1],g.specs[2],c.specs[0],c.specs[1],sh.specs[0]],sec:'§3, §9'});}
+ if(s.id==='gen'){const g=DATA.gen;return panelHTML({sys:'elec',name:g.name,specs:[g.specs[0],g.specs[1],DATA.frame.specs[1],g.specs[2]],sec:'§1, §5, §9'});}
+ if(s.id==='conflict'){const others=CONF_ORDER.filter(c=>c!=='side').map(c=>CONFLICTS[c].title);
+  return `<div class="chip" style="color:#f0a35a">⚠ Source conflict · ${CONF_ORDER.length} flagged</div><h2>Report vs. reference photos</h2>${confHTML('side',false)}
+  <div class="note">Also flagged in the viewer: ${others.map(esc).join(' · ')}</div><div class="src">Source: Studio report §4, §12</div>`;}
+ if(s.id==='styling')return yearsHTML(year,{noX:true});
+ if(s.id==='cyl')return panelHTML(DATA.cyl,{max:5,noConf:true,noWork:true})+confHTML('disp',true);
+ return panelHTML(DATA[s.id],{max:4,maxWork:1,noNote:true,noConf:true});}
+function stopSub(k){const s=STOPS[k];if(s.id!=='styling')return s.sub;return STYLE_SUB[year];}
+const cap=$('caption'),card=$('card');let curCap='',curCard=null,panelKey='';
+function setCard(kind){if(curCard===kind)return;curCard=kind;const k=card.querySelector('.k'),h=card.querySelector('h1'),s=card.querySelector('.s');
+ h.textContent='Anatomy of the Harley-Davidson Model R, 1932–1936';
+ if(kind==='title'){k.textContent='Bike Anatomy · Episode 4';s.textContent='45 cu in air-cooled side-valve V-twin · R · RL · RLD';}
+ else{k.textContent='The bridge from the D to the WL';s.textContent='1932–1936 · horizontal generator · total-loss oil · '+CONF_ORDER.length+' source conflicts flagged';}}
+function setCap(k){const s=STOPS[k];const key=k+'|'+stopSub(k);if(key===curCap)return;curCap=key;
+ cap.querySelector('.k').textContent=String(k+1).padStart(2,'0')+' / 08 · '+s.kick;cap.querySelector('.t').textContent=s.title;cap.querySelector('.s').textContent=stopSub(k);}
+if(TOUR)document.body.classList.add('tour');
+
+/* ------------------------------- loop -------------------------------- */
+let last=CAPTURE?-1000/30:performance.now();const tourStart=CAPTURE?0:performance.now();
+function frame(now){const dt=Math.min(0.05,Math.max(0,(now-last)/1000));last=now;timeSec=now/1000;
+ if(TOUR){let tt=FREEZE?T0:T0+(now-tourStart)/1000;const first=!CAPTURE&&tt<TT.end;tt=tt%TT.end;const o=tourAt(tt,first);
+  cam.yaw=o.cam.yaw;cam.pitch=o.cam.pitch;cam.dist=o.cam.dist;cam.t=o.cam.t;explodeCur=o.explode;
+  if(o.year!==year)setYear(o.year,true);const pi=PAINTS.findIndex(p=>p.id===o.paint);if(pi!==paintIdx)paintIdx=pi;
+  const anyS=o.sel.length>0,kS=FREEZE?1:1-Math.exp(-dt*6),kD=FREEZE?1:1-Math.exp(-dt*5);
+  for(const p of PARTS){p.sel=o.sel.includes(p.id)?1:0;p.selA=lerp(p.selA,p.sel,kS);p.dimA=lerp(p.dimA,anyS&&!p.sel?0.55:0,kD);}
+  lensGoal=o.stop>=0?(W/H<1.3?-0.34:-0.26):0;lensShift=FREEZE?lensGoal:lerp(lensShift,lensGoal,1-Math.exp(-dt*3));
+  const sk=o.stop;
+  if(sk>=0){setCap(sk);const pk=sk+'|'+(STOPS[sk].id==='styling'?year+'|'+paintIdx:'');if(panelKey!==pk&&(o.panA===0||panelKey===''||STOPS[sk].id==='styling')){panelKey=pk;panel.innerHTML=stopPanel(sk);}}
+  if(CAPTURE||FREEZE){const px=H/720;cap.style.opacity=o.capA.toFixed(3);cap.style.transform='translateY('+((1-o.capA)*14*px).toFixed(2)+'px)';panel.style.opacity=o.panA.toFixed(3);panel.style.transform='translateX('+((1-o.panA)*30*px).toFixed(2)+'px)';}
+  else{cap.classList.toggle('show',o.cap!==null);panel.classList.toggle('show',o.panel!==null);}
+  if(o.card)setCard(o.card);card.style.opacity=o.card?o.cardA.toFixed(3):'0';
+ }else{
+  if(autoRotate&&now-lastInput>4500&&ptrs.size===0)goal.yaw+=dt*0.16;
+  const k=1-Math.exp(-dt*6);cam.yaw=lerp(cam.yaw,goal.yaw,k);cam.pitch=lerp(cam.pitch,goal.pitch,k);cam.dist=lerp(cam.dist,goal.dist,k);cam.t=lerp3(cam.t,goal.t,k);
+  explodeCur=lerp(explodeCur,explodeTarget,1-Math.exp(-dt*3.2));if(Math.abs(explodeCur-explodeTarget)<1e-4)explodeCur=explodeTarget;
+  lensShift=lerp(lensShift,lensGoal,1-Math.exp(-dt*4));
+  const anyS=PARTS.some(p=>p.sel);for(const p of PARTS){p.selA=lerp(p.selA,p.sel,1-Math.exp(-dt*8));p.dimA=lerp(p.dimA,anyS&&!p.sel?0.45:0,1-Math.exp(-dt*6));}
+  if(hoverReq&&now-lastHover>90&&ptrs.size===0){lastHover=now;const h=pickAt(hoverReq.x,hoverReq.y);hovered=h;const tip=$('tooltip');
+   if(h){tip.textContent=h.d.name+' · '+SYS[h.d.sys].name+(h.d.nodata?' · no report data':'');tip.style.left=(hoverReq.x+14)+'px';tip.style.top=(hoverReq.y+12)+'px';tip.style.opacity=1;canvas.classList.add('hot');}
+   else{tip.style.opacity=0;canvas.classList.remove('hot');}hoverReq=null;}}
+ const P=PAINTS[paintIdx],kp=FREEZE?1:1-Math.exp(-dt*7);for(const key of ['body','frame','tone'])for(let i=0;i<3;i++)curPaint[key][i]=lerp(curPaint[key][i],P[key][i],kp);
+ for(const p of PARTS){const st=SYS_ORDER.indexOf(p.d.sys)*0.035;const e=clamp((explodeCur-st)/0.79,0,1);p.e=e*e*(3-2*e);}
+ render();if(!CAPTURE)requestAnimationFrame(frame);}
+const sp=Q.get('select');if(sp&&PID[sp]&&!TOUR){select(PID[sp]);PARTS.forEach(p=>{p.selA=p.sel;p.dimA=p.sel?0:0.45;});lensShift=lensGoal;cam.t=goal.t.slice();}
+if(Q.get('panel')==='conflicts'&&!TOUR){openConflicts();PARTS.forEach(p=>{p.selA=p.sel;p.dimA=p.sel?0:0.45;});lensShift=lensGoal;}
+if(Q.get('variant')&&!TOUR){const vi=VARIANTS.findIndex(v=>v.code===Q.get('variant'));if(vi>=0){selectVariant(vi);PARTS.forEach(p=>{p.selA=p.sel;p.dimA=p.sel?0:0.45;});lensShift=lensGoal;}}
+if(Q.get('yaw')){cam.yaw=goal.yaw=parseFloat(Q.get('yaw'));}
+if(Q.get('pitch')){cam.pitch=goal.pitch=parseFloat(Q.get('pitch'));}if(Q.get('dist')){cam.dist=goal.dist=parseFloat(Q.get('dist'));}if(Q.get('ty')){cam.t[1]=goal.t[1]=parseFloat(Q.get('ty'));}
+if(Q.get('still')==='1'){autoRotate=false;$('bRotate').classList.remove('on');}
+totalVerts=countVerts();
+window.__viewer={parts:PARTS.length,withData:PARTS.filter(p=>!p.d.nodata).length,noData:PARTS.filter(p=>p.d.nodata).length,conflicts:CONF_ORDER.length,verts:totalVerts,tourSeconds:TT.end};
+if(CAPTURE){document.body.classList.add('capture');window.__renderAt=t=>{frame(t*1000);return t;};}else requestAnimationFrame(frame);
+</script>
+</body>
+</html>

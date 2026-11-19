@@ -46,5 +46,17 @@ window.BIKES = [
     posterAlt: "Olive-green Harley-Davidson Model C single with twin bullet headlamps, a barrel toolbox across the fork and an upright finned cylinder, posed on a dark studio floor.",
     mindmapAlt: "NotebookLM mind map of the Model C, branching into overview, engine and drivetrain, chassis and equipment, model variants, related models, and restoration.",
     infoAlt: "NotebookLM infographic of the 1929 to 1934 Model C, covering the 30.50 cubic inch flathead, 4,472 units produced, the shared Model D chassis, and comparisons with the Peashooter, the strap tank myth, and the Model A and B singles."
+  },
+  {
+    slug: "model-r",
+    name: "Model R",
+    family: "R-Series",
+    years: "1932–1936",
+    year: 1932,
+    spec: "45 cu in Flathead Solo",
+    blurb: "Olive-green 45-cubic-inch side-valve V-twin that succeeded the Model D and led to the W and WL. The generator now lies horizontally in front of the crankcase.",
+    posterAlt: "Olive-green 1932 Harley-Davidson Model R with a single headlamp, orange pinstriping and a horizontal generator ahead of the crankcase, posed on a dark studio floor.",
+    mindmapAlt: "NotebookLM mind map of the Model R, RL and RLD, covering the Depression-era 45 flathead, its systems, year-by-year changes from 1932 to 1936, and the lineage to the W and WL.",
+    infoAlt: "NotebookLM infographic of the 1932 to 1936 Model R series, covering the 45 cubic inch side-valve V-twin, the horizontal generator, the RL and RLD variants, and the platform's path to the W, WL and WLA."
   }
 ];
