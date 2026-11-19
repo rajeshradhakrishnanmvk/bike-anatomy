@@ -25,7 +25,9 @@ index.html          Gallery. Reads bikes.js.
 bike.html           One study page for every motorcycle (?slug=).
 bikes.js            The only list you edit when a bike is added.
 css/site.css        Workshop styling. System fonts only.
+css/chat.css        Chat panel styling.
 js/site.js          Renders the gallery and the study page.
+js/chat.js          Chat with the bike (study page).
 favicon.svg
 .nojekyll
 bikes/<slug>/       One folder per motorcycle.
@@ -81,9 +83,32 @@ The study page also links to `?tour=1`, which plays the auto-tour inside the vie
 
    `year` is the first model year and controls shop order (earliest first). `years` is the label. Optional `order` replaces `year` for sorting when two machines start together. Optional `posterAlt`, `mindmapAlt`, and `infoAlt` are the image descriptions; without them the page uses the name.
 
-5. Reload. No build, no new HTML file.
+5. Add `bikes/<slug>/persona.json` (see Chat with the bike below) so the bike can talk.
+6. Reload. No build, no new HTML file.
 
 The card and the study page are generated from that entry. `index.html`, `bike.html`, `css/site.css`, and `js/site.js` stay as they are.
+
+## Chat with the bike
+
+Every study page has a **Chat with your bike** button, and every card has a **Chat with the bike** link. The motorcycle answers in the first person from `bikes/<slug>/persona.json`, a short list of facts taken from that bike's NotebookLM report.
+
+- Live answers come from `https://chat.srv1536099.hstgr.cloud/bike/v1/chat/completions`, a small proxy on the VPS. It adds the model key on the server, accepts requests only from this Pages site, rate limits each visitor, caps reply length, and builds the system prompt from the persona file on `main`. There is no key anywhere in this repository or in the browser.
+- If the live chat is slow (20 seconds with no reply), busy, rate limited or down, the page answers from the same facts with a keyword match and says it is in quick facts mode.
+- The conversation is kept for the browser tab only (`sessionStorage`).
+- Add `&chat=offline` to a study page URL to try quick facts mode.
+
+`persona.json` fields:
+
+| Field | Role |
+| --- | --- |
+| `slug`, `name`, `years` | Same as `bikes.js`. |
+| `voice` | One sentence on how the bike talks about itself. |
+| `greeting` | First message in the panel. |
+| `starters` | Three or four starter questions. |
+| `facts` | 10 to 15 items. `a` is one or two first-person sentences from the report; `k` is a list of lowercase keywords for quick facts mode. |
+| `unknowns` | Source conflicts and gaps, so the bike says it doesn't know instead of guessing. |
+
+Keep facts short. The model runs on a small CPU, and the whole prompt should stay under about 400 words.
 
 ## Credits
 

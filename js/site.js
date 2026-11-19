@@ -34,7 +34,8 @@
       info: base + "infographic.jpg",
       infoPng: base + "infographic.png",
       study: "bike.html?slug=" + encodeURIComponent(slug),
-      tour: "bike.html?slug=" + encodeURIComponent(slug) + "#tour"
+      tour: "bike.html?slug=" + encodeURIComponent(slug) + "#tour",
+      chat: "bike.html?slug=" + encodeURIComponent(slug) + "#chat"
     };
   }
 
@@ -65,6 +66,9 @@
       ]),
       el("li", null, [
         el("a", { class: "btn", href: p.explode }, ["Exploded view"])
+      ]),
+      el("li", null, [
+        el("a", { class: "btn btn-chat", href: p.chat, "data-chat-open": bike.slug }, ["Chat with the bike"])
       ])
     ]);
   }
